@@ -31,7 +31,7 @@
   to = "/.netlify/functions/:splat"
   status = 200
 
-[plugins]
+[[plugins]]
   package = "@netlify/plugin-nextjs"
 
 [context.production.environment]
