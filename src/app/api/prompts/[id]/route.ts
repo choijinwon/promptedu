@@ -10,10 +10,7 @@ const supabase = supabaseUrl && supabaseServiceKey
   : null;
 
 // GET /api/prompts/[id] - 특정 프롬프트 조회
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest) {
   try {
     // Supabase가 설정되지 않은 경우 오류 반환
     if (!supabase) {
@@ -23,7 +20,11 @@ export async function GET(
       );
     }
 
-    const { id } = params;
+    // id 추출: /api/prompts/[id]
+    const url = new URL(request.url);
+    const segments = url.pathname.split('/');
+    const idIndex = segments.findIndex(seg => seg === 'prompts') + 1;
+    const id = segments[idIndex];
 
     // 조회수 증가
     await supabase
@@ -56,10 +57,7 @@ export async function GET(
 }
 
 // PUT /api/prompts/[id] - 프롬프트 수정
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PUT(request: NextRequest) {
   try {
     // Supabase가 설정되지 않은 경우 오류 반환
     if (!supabase) {
@@ -69,7 +67,11 @@ export async function PUT(
       );
     }
 
-    const { id } = params;
+    // id 추출: /api/prompts/[id]
+    const url = new URL(request.url);
+    const segments = url.pathname.split('/');
+    const idIndex = segments.findIndex(seg => seg === 'prompts') + 1;
+    const id = segments[idIndex];
     const body = await request.json();
     const {
       title,
@@ -122,10 +124,7 @@ export async function PUT(
 }
 
 // DELETE /api/prompts/[id] - 프롬프트 삭제
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(request: NextRequest) {
   try {
     // Supabase가 설정되지 않은 경우 오류 반환
     if (!supabase) {
@@ -135,7 +134,11 @@ export async function DELETE(
       );
     }
 
-    const { id } = params;
+    // id 추출: /api/prompts/[id]
+    const url = new URL(request.url);
+    const segments = url.pathname.split('/');
+    const idIndex = segments.findIndex(seg => seg === 'prompts') + 1;
+    const id = segments[idIndex];
 
     const { error } = await supabase
       .from('shared_prompts')

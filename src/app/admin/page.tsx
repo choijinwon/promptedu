@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import Grid from '@mui/material/Grid';
 import {
   Box, Container, Typography, Paper, Divider, List, ListItem, ListItemText, Chip, Card, CardContent, CardHeader, Avatar, Stack, useTheme, Button, Dialog, DialogTitle, DialogContent, DialogActions, IconButton, TextField, Snackbar, Alert, FormControl, InputLabel, Select, MenuItem, Table, TableBody, TableCell, TableContainer, TableHead, TableRow
 } from "@mui/material";
@@ -311,72 +310,64 @@ export default function AdminPage() {
         </Box>
 
         {/* 통계 카드 */}
-        <Grid container spacing={3} sx={{ mb: 4 }}>
-          <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ 
-              background: 'rgba(255,255,255,0.95)',
-              borderRadius: 3,
-              boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
-            }}>
-              <CardContent sx={{ textAlign: 'center', py: 3 }}>
-                <Typography variant="h4" color="primary" fontWeight="bold">
-                  {total}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  총 신청 건수
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ 
-              background: 'rgba(255,255,255,0.95)',
-              borderRadius: 3,
-              boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
-            }}>
-              <CardContent sx={{ textAlign: 'center', py: 3 }}>
-                <Typography variant="h4" color="warning.main" fontWeight="bold">
-                  {pending}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  대기중
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ 
-              background: 'rgba(255,255,255,0.95)',
-              borderRadius: 3,
-              boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
-            }}>
-              <CardContent sx={{ textAlign: 'center', py: 3 }}>
-                <Typography variant="h4" color="info.main" fontWeight="bold">
-                  {contacted}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  연락완료
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ 
-              background: 'rgba(255,255,255,0.95)',
-              borderRadius: 3,
-              boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
-            }}>
-              <CardContent sx={{ textAlign: 'center', py: 3 }}>
-                <Typography variant="h4" color="success.main" fontWeight="bold">
-                  {completed}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  상담완료
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
+        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr 1fr' }, gap: 3, mb: 4 }}>
+          <Card sx={{ 
+            background: 'rgba(255,255,255,0.95)',
+            borderRadius: 3,
+            boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
+          }}>
+            <CardContent sx={{ textAlign: 'center', py: 3 }}>
+              <Typography variant="h4" color="primary" fontWeight="bold">
+                {total}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                총 신청 건수
+              </Typography>
+            </CardContent>
+          </Card>
+          <Card sx={{ 
+            background: 'rgba(255,255,255,0.95)',
+            borderRadius: 3,
+            boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
+          }}>
+            <CardContent sx={{ textAlign: 'center', py: 3 }}>
+              <Typography variant="h4" color="warning.main" fontWeight="bold">
+                {pending}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                대기중
+              </Typography>
+            </CardContent>
+          </Card>
+          <Card sx={{ 
+            background: 'rgba(255,255,255,0.95)',
+            borderRadius: 3,
+            boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
+          }}>
+            <CardContent sx={{ textAlign: 'center', py: 3 }}>
+              <Typography variant="h4" color="info.main" fontWeight="bold">
+                {contacted}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                연락완료
+              </Typography>
+            </CardContent>
+          </Card>
+          <Card sx={{ 
+            background: 'rgba(255,255,255,0.95)',
+            borderRadius: 3,
+            boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
+          }}>
+            <CardContent sx={{ textAlign: 'center', py: 3 }}>
+              <Typography variant="h4" color="success.main" fontWeight="bold">
+                {completed}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                상담완료
+              </Typography>
+            </CardContent>
+          </Card>
+        </Box>
 
         {/* 필터 및 검색 */}
         <Paper sx={{ 
@@ -386,8 +377,8 @@ export default function AdminPage() {
           borderRadius: 3,
           boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
         }}>
-          <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12} md={4}>
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr 1fr 1fr' }, gap: 2, alignItems: 'center' }}>
+            <Box sx={{ xs: 12, md: 4 }}>
               <TextField
                 fullWidth
                 placeholder="이름, 이메일, 회사로 검색..."
@@ -397,8 +388,8 @@ export default function AdminPage() {
                   startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />
                 }}
               />
-            </Grid>
-            <Grid item xs={12} md={3}>
+            </Box>
+            <Box sx={{ xs: 12, md: 3 }}>
               <FormControl fullWidth>
                 <InputLabel>상태 필터</InputLabel>
                 <Select
@@ -413,8 +404,8 @@ export default function AdminPage() {
                   <MenuItem value="cancelled">취소</MenuItem>
                 </Select>
               </FormControl>
-            </Grid>
-            <Grid item xs={12} md={3}>
+            </Box>
+            <Box sx={{ xs: 12, md: 3 }}>
               <Button
                 variant="outlined"
                 startIcon={<RefreshIcon />}
@@ -426,8 +417,8 @@ export default function AdminPage() {
               >
                 필터 초기화
               </Button>
-            </Grid>
-            <Grid item xs={12} md={2}>
+            </Box>
+            <Box sx={{ xs: 12, md: 2 }}>
               <Button
                 variant="contained"
                 startIcon={<AddIcon />}
@@ -442,8 +433,8 @@ export default function AdminPage() {
               >
                 신규 등록
               </Button>
-            </Grid>
-          </Grid>
+            </Box>
+          </Box>
         </Paper>
 
         {/* 상담 신청 리스트 */}
@@ -565,8 +556,8 @@ export default function AdminPage() {
           </DialogTitle>
           <DialogContent sx={{ p: 3 }}>
             {selectedConsultation && (
-              <Grid container spacing={3}>
-                <Grid item xs={12} md={6}>
+              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }}>
+                <Box sx={{ xs: 12, md: 6 }}>
                   <Typography variant="h6" gutterBottom>기본 정보</Typography>
                   <Box sx={{ mb: 2 }}>
                     <Typography variant="subtitle2" color="text.secondary">이름</Typography>
@@ -580,8 +571,8 @@ export default function AdminPage() {
                     <Typography variant="subtitle2" color="text.secondary">전화번호</Typography>
                     <Typography variant="body1">{selectedConsultation.phone}</Typography>
                   </Box>
-                </Grid>
-                <Grid item xs={12} md={6}>
+                </Box>
+                <Box sx={{ xs: 12, md: 6 }}>
                   <Typography variant="h6" gutterBottom>회사 정보</Typography>
                   <Box sx={{ mb: 2 }}>
                     <Typography variant="subtitle2" color="text.secondary">회사명</Typography>
@@ -595,8 +586,8 @@ export default function AdminPage() {
                     <Typography variant="subtitle2" color="text.secondary">선호 시간</Typography>
                     <Typography variant="body1">{selectedConsultation.preferred_time}</Typography>
                   </Box>
-                </Grid>
-                <Grid item xs={12}>
+                </Box>
+                <Box sx={{ xs: 12 }}>
                   <Divider sx={{ my: 2 }} />
                   <Typography variant="h6" gutterBottom>상담 목표</Typography>
                   <Box sx={{ mb: 2 }}>
@@ -607,8 +598,8 @@ export default function AdminPage() {
                     <Typography variant="subtitle2" color="text.secondary">목표</Typography>
                     <Typography variant="body1">{selectedConsultation.goals}</Typography>
                   </Box>
-                </Grid>
-                <Grid item xs={12}>
+                </Box>
+                <Box sx={{ xs: 12 }}>
                   <Divider sx={{ my: 2 }} />
                   <Typography variant="h6" gutterBottom>관리 정보</Typography>
                   <Box sx={{ mb: 2 }}>
@@ -631,8 +622,8 @@ export default function AdminPage() {
                       <Typography variant="body1">{selectedConsultation.notes}</Typography>
                     </Box>
                   )}
-                </Grid>
-              </Grid>
+                </Box>
+              </Box>
             )}
           </DialogContent>
           <DialogActions sx={{ p: 3 }}>
@@ -661,43 +652,43 @@ export default function AdminPage() {
               <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 2, color: '#764ba2' }}>
                 기본 정보 <span style={{ color: '#ff5252' }}>*</span>
               </Typography>
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
+              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
+                <Box sx={{ xs: 12, sm: 6 }}>
                   <TextField label="이름 *" fullWidth value={addForm.name} onChange={e => handleAddChange('name', e.target.value)} />
-                </Grid>
-                <Grid item xs={12} sm={6}>
+                </Box>
+                <Box sx={{ xs: 12, sm: 6 }}>
                   <TextField label="이메일 *" fullWidth value={addForm.email} onChange={e => handleAddChange('email', e.target.value)} />
-                </Grid>
-                <Grid item xs={12} sm={6}>
+                </Box>
+                <Box sx={{ xs: 12, sm: 6 }}>
                   <TextField label="전화번호 *" fullWidth value={addForm.phone} onChange={e => handleAddChange('phone', e.target.value)} />
-                </Grid>
-                <Grid item xs={12} sm={6}>
+                </Box>
+                <Box sx={{ xs: 12, sm: 6 }}>
                   <TextField label="회사명 *" fullWidth value={addForm.company} onChange={e => handleAddChange('company', e.target.value)} />
-                </Grid>
-                <Grid item xs={12} sm={6}>
+                </Box>
+                <Box sx={{ xs: 12, sm: 6 }}>
                   <TextField label="직책 *" fullWidth value={addForm.position} onChange={e => handleAddChange('position', e.target.value)} />
-                </Grid>
-                <Grid item xs={12} sm={6}>
+                </Box>
+                <Box sx={{ xs: 12, sm: 6 }}>
                   <TextField label="선호 시간" fullWidth value={addForm.preferred_time} onChange={e => handleAddChange('preferred_time', e.target.value)} />
-                </Grid>
-              </Grid>
+                </Box>
+              </Box>
             </Box>
             <Divider sx={{ my: 2 }} />
             <Box sx={{ mb: 3 }}>
               <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 2, color: '#764ba2' }}>
                 상담 내용
               </Typography>
-              <Grid container spacing={2}>
-                <Grid item xs={12}>
+              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr' }, gap: 2 }}>
+                <Box sx={{ xs: 12, sm: 12 }}>
                   <TextField label="현재 업무" fullWidth multiline rows={2} value={addForm.current_work} onChange={e => handleAddChange('current_work', e.target.value)} />
-                </Grid>
-                <Grid item xs={12}>
+                </Box>
+                <Box sx={{ xs: 12, sm: 12 }}>
                   <TextField label="상담 목표" fullWidth multiline rows={2} value={addForm.goals} onChange={e => handleAddChange('goals', e.target.value)} />
-                </Grid>
-                <Grid item xs={12}>
+                </Box>
+                <Box sx={{ xs: 12, sm: 12 }}>
                   <TextField label="메모" fullWidth multiline rows={2} value={addForm.notes} onChange={e => handleAddChange('notes', e.target.value)} />
-                </Grid>
-              </Grid>
+                </Box>
+              </Box>
             </Box>
           </DialogContent>
           <DialogActions sx={{ p: 2 }}>

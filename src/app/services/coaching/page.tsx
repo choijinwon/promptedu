@@ -1,6 +1,7 @@
 "use client";
 
-import { Box, Container, Typography, Paper, Divider, List, ListItem, ListItemText, Chip, Grid, Card, CardContent, CardHeader, Avatar, Stack, useTheme, Button, Dialog, DialogTitle, DialogContent, DialogActions, IconButton, TextField, Snackbar, Alert } from "@mui/material";
+import { Box, Container, Typography, Paper, Divider, List, ListItem, ListItemText, Chip, Card, CardContent, CardHeader, Avatar, Stack, useTheme, Button, Dialog, DialogTitle, DialogContent, DialogActions, IconButton, TextField, Snackbar, Alert } from "@mui/material";
+import { Grid } from "@mui/material";
 import { ReactNode, useState, useEffect } from "react";
 import { useRouter } from 'next/navigation';
 import {
@@ -504,8 +505,8 @@ export default function CoachingPage() {
         current_work: consultationForm.currentWork,
         status: 'pending'
       };
-      if ('preferredTime' in dbPayload) delete dbPayload.preferredTime;
-      if ('currentWork' in dbPayload) delete dbPayload.currentWork;
+      if ('preferredTime' in dbPayload) dbPayload.preferredTime = '';
+      if ('currentWork' in dbPayload) dbPayload.currentWork = '';
 
       const { data, error } = await supabase
         .from('consultations')
@@ -671,7 +672,7 @@ export default function CoachingPage() {
                 { title: '실습 & 피드백 (10분)', icon: '🔎', color: '#007bff', bgcolor: '#f0f8ff' },
                 { title: '마무리 (5분)', icon: '✅', color: '#6f42c1', bgcolor: '#f8f4ff' }
               ].map((step, index) => (
-                <Grid item xs={12} key={index}>
+                <Box key={index} sx={{ mb: 3 }}>
                   <Paper 
                     elevation={3} 
                     sx={{ 
@@ -711,7 +712,7 @@ export default function CoachingPage() {
                       {index === 3 && "핵심 포인트 요약, 개인 프롬프트 라이브러리 업데이트, 다음 세션 방향성 논의"}
                     </Typography>
                   </Paper>
-                </Grid>
+                </Box>
               ))}
             </Grid>
           </Box>
@@ -857,7 +858,7 @@ export default function CoachingPage() {
               {['basic', 'premium', 'enterprise'].map((packageName, index) => {
                 const packageInfo = getPackageInfo(packageName);
                 return (
-                  <Grid item xs={12} md={4} key={packageName}>
+                  <Box key={packageName} sx={{ width: { xs: '100%', md: '33.333%' }, display: 'flex' }}>
                     <Card 
                       elevation={6}
                       sx={{ 
@@ -908,7 +909,7 @@ export default function CoachingPage() {
                         </List>
                       </CardContent>
                     </Card>
-                  </Grid>
+                  </Box>
                 );
               })}
             </Grid>
@@ -948,7 +949,7 @@ export default function CoachingPage() {
                   answer: '코칭 완료 후에도 이메일을 통한 지속적인 지원과 프롬프트 개선 가이드를 제공합니다.'
                 }
               ].map((faq, index) => (
-                <Grid item xs={12} key={index}>
+                <Box key={index} sx={{ mb: 3 }}>
                   <Paper 
                     elevation={3}
                     sx={{ 
@@ -970,7 +971,7 @@ export default function CoachingPage() {
                       {faq.answer}
                     </Typography>
                   </Paper>
-                </Grid>
+                </Box>
               ))}
             </Grid>
           </Box>
@@ -1018,52 +1019,52 @@ export default function CoachingPage() {
               <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 2, color: '#764ba2', letterSpacing: 1 }}>
                 기본 정보 <span style={{ color: '#ff5252' }}>*</span>
               </Typography>
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
+              <Box display="grid" gridTemplateColumns={{ xs: '1fr', sm: '1fr 1fr' }} gap={2}>
+                <Box>
                   <TextField label="이름 *" fullWidth value={consultationForm.name} onChange={e => handleFormChange('name', e.target.value)}
                     error={!!formErrors.name} helperText={formErrors.name} sx={{ background: 'white', borderRadius: 2 }} />
-                </Grid>
-                <Grid item xs={12} sm={6}>
+                </Box>
+                <Box>
                   <TextField label="이메일 *" fullWidth value={consultationForm.email} onChange={e => handleFormChange('email', e.target.value)}
                     error={!!formErrors.email} helperText={formErrors.email} sx={{ background: 'white', borderRadius: 2 }} />
-                </Grid>
-                <Grid item xs={12} sm={6}>
+                </Box>
+                <Box>
                   <TextField label="전화번호 *" fullWidth value={consultationForm.phone} onChange={e => handleFormChange('phone', e.target.value)}
                     error={!!formErrors.phone} helperText={formErrors.phone} sx={{ background: 'white', borderRadius: 2 }} placeholder="010-1234-5678" />
-                </Grid>
-                <Grid item xs={12} sm={6}>
+                </Box>
+                <Box>
                   <TextField label="회사명 *" fullWidth value={consultationForm.company} onChange={e => handleFormChange('company', e.target.value)}
                     error={!!formErrors.company} helperText={formErrors.company} sx={{ background: 'white', borderRadius: 2 }} />
-                </Grid>
-                <Grid item xs={12} sm={6}>
+                </Box>
+                <Box>
                   <TextField label="직책 *" fullWidth value={consultationForm.position} onChange={e => handleFormChange('position', e.target.value)}
                     error={!!formErrors.position} helperText={formErrors.position} sx={{ background: 'white', borderRadius: 2 }} />
-                </Grid>
-                <Grid item xs={12} sm={6}>
+                </Box>
+                <Box>
                   <TextField label="선호 시간" fullWidth value={consultationForm.preferredTime} onChange={e => handleFormChange('preferredTime', e.target.value)}
                     sx={{ background: 'white', borderRadius: 2 }} />
-                </Grid>
-              </Grid>
+                </Box>
+              </Box>
             </Box>
             <Divider sx={{ my: 2 }} />
             <Box sx={{ mb: 3 }}>
               <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 2, color: '#764ba2', letterSpacing: 1 }}>
                 상담 내용
               </Typography>
-              <Grid container spacing={2}>
-                <Grid item xs={12}>
+              <Box display="grid" gridTemplateColumns={{ xs: '1fr' }} gap={2}>
+                <Box>
                   <TextField label="현재 업무" fullWidth multiline rows={2} value={consultationForm.currentWork} onChange={e => handleFormChange('currentWork', e.target.value)}
                     sx={{ background: 'white', borderRadius: 2 }} />
-                </Grid>
-                <Grid item xs={12}>
+                </Box>
+                <Box>
                   <TextField label="상담 목표" fullWidth multiline rows={2} value={consultationForm.goals} onChange={e => handleFormChange('goals', e.target.value)}
                     sx={{ background: 'white', borderRadius: 2 }} />
-                </Grid>
-                <Grid item xs={12}>
+                </Box>
+                <Box>
                   <TextField label="메모" fullWidth multiline rows={2} value={consultationForm.notes} onChange={e => handleFormChange('notes', e.target.value)}
                     sx={{ background: 'white', borderRadius: 2 }} />
-                </Grid>
-              </Grid>
+                </Box>
+              </Box>
             </Box>
             <Typography 
               variant="body2" 

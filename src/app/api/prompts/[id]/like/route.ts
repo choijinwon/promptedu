@@ -10,10 +10,7 @@ const supabase = supabaseUrl && supabaseServiceKey
   : null;
 
 // POST /api/prompts/[id]/like - 좋아요 토글
-export async function POST(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function POST(request: NextRequest) {
   try {
     // Supabase가 설정되지 않은 경우 오류 반환
     if (!supabase) {
@@ -23,7 +20,13 @@ export async function POST(
       );
     }
 
-    const { id } = params;
+    // id 추출: /api/prompts/[id]/like
+    const url = new URL(request.url);
+    const segments = url.pathname.split('/');
+    // .../api/prompts/[id]/like
+    const idIndex = segments.findIndex(seg => seg === 'prompts') + 1;
+    const id = segments[idIndex];
+
     const body = await request.json();
     const { userId, action } = body; // action: 'like' | 'unlike'
 
