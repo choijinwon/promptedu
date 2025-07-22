@@ -4,9 +4,6 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, Container, Typography, TextField, Button, Paper, Snackbar, Alert } from '@mui/material';
 
-const ADMIN_ID = 'admin';
-const ADMIN_PW = 'admin1234';
-
 export default function AdminLoginPage() {
   const router = useRouter();
   const [id, setId] = useState('');
