@@ -33,6 +33,7 @@ export async function POST(req: NextRequest) {
     // 성공: 최소 정보 반환
     return NextResponse.json({ success: true, name: user.name, id: user.id });
   } catch (e) {
-    return NextResponse.json({ error: '서버 오류가 발생했습니다.' }, { status: 500 });
+    // 에러 메시지와 스택을 함께 반환 (운영 환경에서는 노출 주의)
+    return NextResponse.json({ error: '서버 오류가 발생했습니다.', message: e instanceof Error ? e.message : String(e), stack: e instanceof Error ? e.stack : undefined }, { status: 500 });
   }
 } 
