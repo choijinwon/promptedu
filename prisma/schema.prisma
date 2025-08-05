@@ -1,0 +1,183 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  username  String   @unique
+  password  String
+  name      String?
+  avatar    String?
+  bio       String?
+  role      UserRole @default(USER)
+  isVerified Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  prompts   Prompt[]
+  approvedPrompts Prompt[] @relation("ApprovedBy")
+  orders    Order[]
+  reviews   Review[]
+  favorites Favorite[]
+  creatorApplication CreatorApplication?
+  reviewedApplications CreatorApplication[] @relation("CreatorApplicationReviewer")
+
+  @@map("users")
+}
+
+model Category {
+  id          String  @id @default(cuid())
+  name        String  @unique
+  description String?
+  icon        String?
+  color       String?
+  isActive    Boolean @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  prompts Prompt[]
+
+  @@map("categories")
+}
+
+model Prompt {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  content     String
+  price       Int      @default(0)
+  categoryId  String
+  authorId    String
+  approvedBy  String?
+  approvedAt  DateTime?
+  tags        String   // JSON string of tags
+  image       String?
+  downloads   Int      @default(0)
+  views       Int      @default(0)
+  rating      Float    @default(0)
+  reviewCount Int      @default(0)
+  status      PromptStatus @default(DRAFT)
+  isFeatured  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  category   Category   @relation(fields: [categoryId], references: [id])
+  author     User       @relation(fields: [authorId], references: [id])
+  approvedByUser User?  @relation("ApprovedBy", fields: [approvedBy], references: [id])
+  orders     Order[]
+  reviews    Review[]
+  favorites  Favorite[]
+
+  @@map("prompts")
+}
+
+model Order {
+  id        String      @id @default(cuid())
+  userId    String
+  promptId  String
+  amount    Int
+  status    OrderStatus @default(PENDING)
+  paymentMethod String?
+  transactionId String?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  // Relations
+  user   User   @relation(fields: [userId], references: [id])
+  prompt Prompt @relation(fields: [promptId], references: [id])
+
+  @@map("orders")
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  userId    String
+  promptId  String
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user   User   @relation(fields: [userId], references: [id])
+  prompt Prompt @relation(fields: [promptId], references: [id])
+
+  @@unique([userId, promptId])
+  @@map("reviews")
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  promptId  String
+  createdAt DateTime @default(now())
+
+  // Relations
+  user   User   @relation(fields: [userId], references: [id])
+  prompt Prompt @relation(fields: [promptId], references: [id])
+
+  @@unique([userId, promptId])
+  @@map("favorites")
+}
+
+enum UserRole {
+  USER
+  CREATOR
+  ADMIN
+}
+
+enum PromptStatus {
+  DRAFT
+  PENDING
+  ACTIVE
+  REJECTED
+  ARCHIVED
+}
+
+model CreatorApplication {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  portfolio   String?  // 포트폴리오 URL
+  experience  String   // 경험 설명
+  motivation  String   // 신청 동기
+  status      CreatorApplicationStatus @default(PENDING)
+  reviewedBy  String?
+  reviewedAt  DateTime?
+  reviewNote  String?  // 관리자 검토 노트
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user        User     @relation(fields: [userId], references: [id])
+  reviewer    User?    @relation("CreatorApplicationReviewer", fields: [reviewedBy], references: [id])
+
+  @@map("creator_applications")
+}
+
+enum CreatorApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum OrderStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
