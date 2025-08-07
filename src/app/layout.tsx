@@ -6,56 +6,60 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: {
-    default: "Prompt Hub - 고품질 AI 프롬프트 거래 플랫폼",
-    template: "%s | Prompt Hub"
+    default: "PromptEdu - AI 프롬프트 마켓플레이스 | ChatGPT, Claude 프롬프트 거래",
+    template: "%s | PromptEdu"
   },
-  description: "AI 프롬프트 제작자와 사용자를 연결하는 고품질 프롬프트 거래, 공유 플랫폼입니다. ChatGPT, Claude, GPT-4 등 다양한 AI 모델용 프롬프트를 구매하고 판매하세요.",
+  description: "AI 프롬프트 제작자와 사용자를 연결하는 최고의 프롬프트 마켓플레이스입니다. ChatGPT, Claude, GPT-4 등 다양한 AI 모델용 고품질 프롬프트를 구매하고 판매하세요. 무료 프롬프트 공유도 가능합니다.",
   keywords: [
-    "프롬프트",
     "AI 프롬프트",
     "ChatGPT 프롬프트",
     "Claude 프롬프트",
     "GPT-4 프롬프트",
+    "프롬프트 마켓플레이스",
     "AI 챗봇",
     "프롬프트 엔지니어링",
     "AI 자동화",
     "프롬프트 크리에이터",
     "AI 플랫폼",
     "프롬프트 거래",
-    "프롬프트 마켓플레이스"
+    "무료 프롬프트",
+    "AI 도구",
+    "프롬프트 템플릿",
+    "AI 비즈니스",
+    "프롬프트 최적화"
   ],
-  authors: [{ name: "Prompt Hub Team" }],
-  creator: "Prompt Hub",
-  publisher: "Prompt Hub",
+  authors: [{ name: "PromptEdu Team" }],
+  creator: "PromptEdu",
+  publisher: "PromptEdu",
   formatDetection: {
     email: false,
     address: false,
     telephone: false,
   },
-  metadataBase: new URL('https://prompt-hub.com'),
+  metadataBase: new URL('https://promptedu.io'),
   alternates: {
     canonical: '/',
   },
   openGraph: {
     type: 'website',
     locale: 'ko_KR',
-    url: 'https://prompt-hub.com',
-    siteName: 'Prompt Hub',
-    title: 'Prompt Hub - 고품질 AI 프롬프트 거래 플랫폼',
-    description: 'AI 프롬프트 제작자와 사용자를 연결하는 고품질 프롬프트 거래, 공유 플랫폼입니다.',
+    url: 'https://promptedu.io',
+    siteName: 'PromptEdu',
+    title: 'PromptEdu - AI 프롬프트 마켓플레이스',
+    description: 'AI 프롬프트 제작자와 사용자를 연결하는 최고의 프롬프트 마켓플레이스입니다. ChatGPT, Claude, GPT-4 등 다양한 AI 모델용 고품질 프롬프트를 구매하고 판매하세요.',
     images: [
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'Prompt Hub - AI 프롬프트 거래 플랫폼',
+        alt: 'PromptEdu - AI 프롬프트 마켓플레이스',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Prompt Hub - 고품질 AI 프롬프트 거래 플랫폼',
-    description: 'AI 프롬프트 제작자와 사용자를 연결하는 고품질 프롬프트 거래, 공유 플랫폼입니다.',
+    title: 'PromptEdu - AI 프롬프트 마켓플레이스',
+    description: 'AI 프롬프트 제작자와 사용자를 연결하는 최고의 프롬프트 마켓플레이스입니다.',
     images: ['/og-image.png'],
   },
   robots: {
@@ -73,6 +77,11 @@ export const metadata: Metadata = {
     google: 'your-google-verification-code',
     yandex: 'your-yandex-verification-code',
     yahoo: 'your-yahoo-verification-code',
+  },
+  category: 'technology',
+  classification: 'AI Platform',
+  other: {
+    'naver-site-verification': 'your-naver-verification-code',
   },
 };
 

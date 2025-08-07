@@ -2,7 +2,7 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://prompt-hub.com/sitemap.xml
+Sitemap: https://promptedu.io/sitemap.xml
 
 # Crawl-delay
 Crawl-delay: 1
@@ -10,11 +10,12 @@ Crawl-delay: 1
 # Disallow admin pages
 Disallow: /admin/
 Disallow: /api/
-Disallow: /_next/
-Disallow: /static/
+Disallow: /dashboard/
+Disallow: /write/
 
 # Allow important pages
-Allow: /shared-prompts/
-Allow: /marketplace/
-Allow: /write/
-Allow: /creator/apply/ 
+Allow: /marketplace
+Allow: /shared-prompts
+Allow: /login
+Allow: /register
+Allow: /creator/apply 
