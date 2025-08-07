@@ -42,12 +42,10 @@ export async function POST(request: NextRequest) {
     }
 
     // 이미 즐겨찾기에 추가되어 있는지 확인
-    const existingFavorite = await prisma.favorite.findUnique({
+    const existingFavorite = await prisma.favorite.findFirst({
       where: {
-        userId_promptId: {
-          userId: payload.userId,
-          promptId: promptId,
-        },
+        userId: payload.userId,
+        promptId: promptId,
       },
     });
 
@@ -116,12 +114,19 @@ export async function DELETE(request: NextRequest) {
     }
 
     // 즐겨찾기 제거
-    await prisma.favorite.deleteMany({
+    const deletedCount = await prisma.favorite.deleteMany({
       where: {
         userId: payload.userId,
         promptId: promptId,
       },
     });
+
+    if (deletedCount.count === 0) {
+      return NextResponse.json(
+        { error: '즐겨찾기를 찾을 수 없습니다.' },
+        { status: 404 }
+      );
+    }
 
     return NextResponse.json({
       message: '즐겨찾기에서 제거되었습니다.',

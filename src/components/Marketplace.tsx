@@ -130,12 +130,17 @@ export default function Marketplace() {
         },
       });
 
+      const data = await response.json();
+
       if (response.ok) {
-        const data = await response.json();
         setFavorites(data.favorites || []);
+      } else {
+        console.error('Failed to fetch favorites:', data.error);
+        showToast(data.error || "즐겨찾기를 불러오는데 실패했습니다.", "error");
       }
     } catch (error) {
       console.error('Failed to fetch favorites:', error);
+      showToast("즐겨찾기를 불러오는데 실패했습니다.", "error");
     }
   };
 
@@ -296,11 +301,13 @@ export default function Marketplace() {
           },
         });
 
+        const data = await response.json();
+
         if (response.ok) {
           setFavorites(favorites.filter(fav => fav.promptId !== promptId));
           showToast("즐겨찾기에서 제거되었습니다.", "success");
         } else {
-          showToast("즐겨찾기 제거에 실패했습니다.", "error");
+          showToast(data.error || "즐겨찾기 제거에 실패했습니다.", "error");
         }
       } else {
         // 즐겨찾기 추가
@@ -313,15 +320,17 @@ export default function Marketplace() {
           body: JSON.stringify({ promptId }),
         });
 
+        const data = await response.json();
+
         if (response.ok) {
-          const data = await response.json();
           setFavorites([...favorites, data.favorite]);
           showToast("즐겨찾기에 추가되었습니다.", "success");
         } else {
-          showToast("즐겨찾기 추가에 실패했습니다.", "error");
+          showToast(data.error || "즐겨찾기 추가에 실패했습니다.", "error");
         }
       }
     } catch (error) {
+      console.error('Favorite toggle error:', error);
       showToast("즐겨찾기 처리 중 오류가 발생했습니다.", "error");
     } finally {
       // 애니메이션 종료
