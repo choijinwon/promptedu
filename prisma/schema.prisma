@@ -10,7 +10,7 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = env("DATABASE_URL")
+  url      = "file:./dev.db"
 }
 
 model User {
@@ -71,7 +71,9 @@ model Prompt {
   rating      Float    @default(0)
   reviewCount Int      @default(0)
   status      PromptStatus @default(DRAFT)
+  isPublic    Boolean  @default(true)  // 공개/비공개 여부
   isFeatured  Boolean  @default(false)
+  type        PromptType @default(MARKETPLACE) // 마켓플레이스 또는 공유 프롬프트
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -147,6 +149,11 @@ enum PromptStatus {
   ACTIVE
   REJECTED
   ARCHIVED
+}
+
+enum PromptType {
+  MARKETPLACE  // 마켓플레이스용 (유료/무료)
+  SHARED       // 공유 프롬프트용 (무료만)
 }
 
 model CreatorApplication {

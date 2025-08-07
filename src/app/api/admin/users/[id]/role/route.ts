@@ -4,9 +4,10 @@ import { verifyToken, extractTokenFromHeader } from '@/lib/auth';
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const token = extractTokenFromHeader(request.headers.get('authorization') || undefined);
     if (!token) {
       return NextResponse.json(
@@ -49,7 +50,7 @@ export async function PUT(
 
     // 사용자 존재 여부 확인
     const targetUser = await prisma.user.findUnique({
-      where: { id: params.id },
+      where: { id: id },
       select: { id: true, role: true }
     });
 
@@ -61,7 +62,7 @@ export async function PUT(
     }
 
     // 자기 자신의 역할을 변경하려는 경우 방지
-    if (params.id === payload.userId) {
+    if (id === payload.userId) {
       return NextResponse.json(
         { error: '자기 자신의 역할은 변경할 수 없습니다.' },
         { status: 400 }
@@ -70,7 +71,7 @@ export async function PUT(
 
     // 역할 변경
     const updatedUser = await prisma.user.update({
-      where: { id: params.id },
+      where: { id: id },
       data: { role },
       select: {
         id: true,

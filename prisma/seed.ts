@@ -94,6 +94,27 @@ async function main() {
       role: 'ADMIN',
     },
     {
+      email: 'a@test.com',
+      username: 'user_a',
+      password: 'password123',
+      name: '테스트 사용자 A',
+      role: 'USER',
+    },
+    {
+      email: 'b@test.com',
+      username: 'user_b',
+      password: 'password123',
+      name: '테스트 사용자 B',
+      role: 'USER',
+    },
+    {
+      email: 'c@test.com',
+      username: 'user_c',
+      password: 'password123',
+      name: '테스트 사용자 C',
+      role: 'USER',
+    },
+    {
       email: 'creator1@example.com',
       username: 'ai_creator',
       password: 'password123',
@@ -152,6 +173,7 @@ async function main() {
       authorEmail: 'creator1@example.com',
       tags: ['블로그', 'SEO', '글쓰기', '마케팅'],
       status: 'ACTIVE',
+      type: 'MARKETPLACE',
     },
     {
       title: '이메일 마케팅 자동화 프롬프트',
@@ -180,6 +202,7 @@ async function main() {
       categoryName: '생산성',
       authorEmail: 'creator1@example.com',
       tags: ['계획', '생산성', '시간관리', '무료'],
+      type: 'SHARED',
     },
     {
       title: '기업용 고객 서비스 프롬프트',
@@ -300,6 +323,7 @@ async function main() {
             authorId: author.id,
             tags: JSON.stringify(promptData.tags),
             status: (promptData.status || 'ACTIVE') as any,
+            type: (promptData.type || 'MARKETPLACE') as any,
             downloads: promptData.status === 'ACTIVE' ? Math.floor(Math.random() * 1000) + 100 : 0,
             views: promptData.status === 'ACTIVE' ? Math.floor(Math.random() * 5000) + 500 : 0,
             rating: promptData.status === 'ACTIVE' ? 4.5 + Math.random() * 0.5 : 0,

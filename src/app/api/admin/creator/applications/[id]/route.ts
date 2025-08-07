@@ -4,9 +4,10 @@ import { verifyToken, extractTokenFromHeader } from '@/lib/auth';
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const token = extractTokenFromHeader(request.headers.get('authorization') || undefined);
     if (!token) {
       return NextResponse.json(
@@ -48,7 +49,7 @@ export async function PUT(
 
     // 신청서 존재 여부 확인
     const application = await prisma.creatorApplication.findUnique({
-      where: { id: params.id },
+      where: { id: id },
       include: {
         user: {
           select: {
@@ -78,7 +79,7 @@ export async function PUT(
 
     // 신청서 상태 업데이트
     const updatedApplication = await prisma.creatorApplication.update({
-      where: { id: params.id },
+      where: { id: id },
       data: {
         status: action === 'approve' ? 'APPROVED' : 'REJECTED',
         reviewedAt: new Date(),

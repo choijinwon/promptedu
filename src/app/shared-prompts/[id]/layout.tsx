@@ -4,13 +4,14 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 interface Props {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
+    const { id } = await params;
     const prompt = await prisma.prompt.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         category: true,
         author: {
@@ -46,7 +47,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         title,
         description,
         type: "article",
-        url: `https://prompt-hub.com/shared-prompts/${params.id}`,
+        url: `https://prompt-hub.com/shared-prompts/${id}`,
         images: [
           {
             url: prompt.image || "/og-prompt.png",
@@ -66,7 +67,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         images: [prompt.image || "/og-prompt.png"],
       },
       alternates: {
-        canonical: `/shared-prompts/${params.id}`,
+        canonical: `/shared-prompts/${id}`,
       },
       other: {
         "article:author": authorName,

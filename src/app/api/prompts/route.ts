@@ -19,6 +19,8 @@ export async function GET(request: NextRequest) {
     // Build where clause
     const where: any = {
       status: status as any,
+      isPublic: true, // 공개된 프롬프트만 조회
+      type: 'MARKETPLACE', // 마켓플레이스용 프롬프트만 조회
     };
 
     if (category && category !== '전체') {
@@ -145,7 +147,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { title, description, content, price, categoryId, tags } = await request.json();
+    const { title, description, content, price, categoryId, tags, isPublic, type } = await request.json();
 
     // Validation
     if (!title || !description || !content || !categoryId) {
@@ -186,6 +188,8 @@ export async function POST(request: NextRequest) {
         categoryId,
         authorId: payload.userId,
         tags: JSON.stringify(Array.isArray(tags) ? tags : []),
+        isPublic: isPublic === 'true' || isPublic === true,
+        type: type || 'MARKETPLACE', // 기본값은 마켓플레이스
         status: 'PENDING', // 관리자 승인 필요
       },
       include: {

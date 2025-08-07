@@ -16,6 +16,8 @@ interface FormValues {
   price: number;
   categoryId: string;
   tags: string;
+  isPublic: boolean;
+  type: 'MARKETPLACE' | 'SHARED';
 }
 
 export default function WritePage() {
@@ -38,6 +40,8 @@ export default function WritePage() {
       price: 0,
       categoryId: "",
       tags: "",
+      isPublic: true,
+      type: 'MARKETPLACE',
     }
   });
 
@@ -200,6 +204,61 @@ export default function WritePage() {
               placeholder="예: 블로그,SEO,마케팅"
             />
           </div>
+        </div>
+        <div>
+          <label className="block mb-1 text-sm font-medium">프롬프트 타입</label>
+          <div className="flex items-center space-x-4">
+            <label className="flex items-center">
+              <input
+                type="radio"
+                {...register("type")}
+                value="MARKETPLACE"
+                className="mr-2"
+                defaultChecked
+              />
+              <span className="text-sm">마켓플레이스</span>
+            </label>
+            <label className="flex items-center">
+              <input
+                type="radio"
+                {...register("type")}
+                value="SHARED"
+                className="mr-2"
+              />
+              <span className="text-sm">공유 프롬프트 (무료)</span>
+            </label>
+          </div>
+          <p className="text-xs text-gray-500 mt-1">
+            마켓플레이스: 유료/무료 판매 가능. 공유 프롬프트: 무료로만 공유됩니다.
+          </p>
+        </div>
+
+        <div>
+          <label className="block mb-1 text-sm font-medium">공개 설정</label>
+          <div className="flex items-center space-x-4">
+            <label className="flex items-center">
+              <input
+                type="radio"
+                {...register("isPublic")}
+                value="true"
+                className="mr-2"
+                defaultChecked
+              />
+              <span className="text-sm">공개</span>
+            </label>
+            <label className="flex items-center">
+              <input
+                type="radio"
+                {...register("isPublic")}
+                value="false"
+                className="mr-2"
+              />
+              <span className="text-sm">비공개</span>
+            </label>
+          </div>
+          <p className="text-xs text-gray-500 mt-1">
+            공개: 다른 사용자들이 볼 수 있습니다. 비공개: 나만 볼 수 있습니다.
+          </p>
         </div>
         <button
           type="submit"

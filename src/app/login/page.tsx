@@ -76,6 +76,16 @@ export default function LoginPage() {
             회원가입하기
           </Link>
         </div>
+        
+        {/* 테스트 계정 정보 */}
+        <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+          <h3 className="text-sm font-medium text-gray-700 mb-2">테스트 계정</h3>
+          <div className="text-xs text-gray-600 space-y-1">
+            <div><strong>a@test.com</strong> / password123</div>
+            <div><strong>b@test.com</strong> / password123</div>
+            <div><strong>c@test.com</strong> / password123</div>
+          </div>
+        </div>
       </form>
     </div>
   );
