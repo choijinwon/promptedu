@@ -4,8 +4,9 @@ import { verifyToken, extractTokenFromHeader } from '@/lib/auth';
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     const token = extractTokenFromHeader(request.headers.get('authorization') || undefined);
     if (!token) {
@@ -23,7 +24,7 @@ export async function POST(
       );
     }
 
-    const promptId = params.id;
+    const promptId = id;
 
     // 프롬프트 조회
     const prompt = await prisma.prompt.findUnique({
