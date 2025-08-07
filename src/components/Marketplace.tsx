@@ -6,6 +6,7 @@ import { MagnifyingGlassIcon, FunnelIcon, StarIcon, ArrowDownTrayIcon, EyeIcon, 
 import { StarIcon as StarIconSolid, HeartIcon as HeartIconSolid } from "@heroicons/react/24/solid";
 import Link from "next/link";
 import PromptPreview from "./PromptPreview";
+import Toast from "./Toast";
 
 interface Prompt {
   id: string;
@@ -58,6 +59,16 @@ export default function Marketplace() {
   const [showSearchHistory, setShowSearchHistory] = useState(false);
   const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
   const [showPreview, setShowPreview] = useState(false);
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "success" | "error" | "info";
+    isVisible: boolean;
+  }>({
+    message: "",
+    type: "info",
+    isVisible: false,
+  });
+  const [favoriteAnimations, setFavoriteAnimations] = useState<{ [key: string]: boolean }>({});
 
   // 로그인 상태 확인
   useEffect(() => {
@@ -266,11 +277,14 @@ export default function Marketplace() {
   const handleToggleFavorite = async (promptId: string) => {
     const token = localStorage.getItem("prompt_hub_token");
     if (!token) {
-      alert("로그인이 필요합니다.");
+      showToast("로그인이 필요합니다.", "error");
       return;
     }
 
     const isFavorite = favorites.some(fav => fav.promptId === promptId);
+
+    // 애니메이션 시작
+    setFavoriteAnimations(prev => ({ ...prev, [promptId]: true }));
 
     try {
       if (isFavorite) {
@@ -284,6 +298,9 @@ export default function Marketplace() {
 
         if (response.ok) {
           setFavorites(favorites.filter(fav => fav.promptId !== promptId));
+          showToast("즐겨찾기에서 제거되었습니다.", "success");
+        } else {
+          showToast("즐겨찾기 제거에 실패했습니다.", "error");
         }
       } else {
         // 즐겨찾기 추가
@@ -299,10 +316,18 @@ export default function Marketplace() {
         if (response.ok) {
           const data = await response.json();
           setFavorites([...favorites, data.favorite]);
+          showToast("즐겨찾기에 추가되었습니다.", "success");
+        } else {
+          showToast("즐겨찾기 추가에 실패했습니다.", "error");
         }
       }
     } catch (error) {
-      alert('즐겨찾기 처리 중 오류가 발생했습니다.');
+      showToast("즐겨찾기 처리 중 오류가 발생했습니다.", "error");
+    } finally {
+      // 애니메이션 종료
+      setTimeout(() => {
+        setFavoriteAnimations(prev => ({ ...prev, [promptId]: false }));
+      }, 500);
     }
   };
 
@@ -316,6 +341,18 @@ export default function Marketplace() {
   const handlePreview = (prompt: Prompt) => {
     setSelectedPrompt(prompt);
     setShowPreview(true);
+  };
+
+  const showToast = (message: string, type: "success" | "error" | "info") => {
+    setToast({
+      message,
+      type,
+      isVisible: true,
+    });
+  };
+
+  const hideToast = () => {
+    setToast(prev => ({ ...prev, isVisible: false }));
   };
 
   const renderStars = useMemo(() => {
@@ -676,16 +713,23 @@ export default function Marketplace() {
                       </div>
                       <div className="flex gap-1">
                         {isLoggedIn && (
-                          <button
+                          <motion.button
                             onClick={() => handleToggleFavorite(prompt.id)}
                             className="p-2 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-200"
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            animate={favoriteAnimations[prompt.id] ? {
+                              scale: [1, 1.3, 1],
+                              rotate: [0, 10, -10, 0],
+                            } : {}}
+                            transition={{ duration: 0.3 }}
                           >
                             {favorites.some(fav => fav.promptId === prompt.id) ? (
                               <HeartIconSolid className="w-4 h-4 text-red-500" />
                             ) : (
                               <HeartIcon className="w-4 h-4 text-gray-400" />
                             )}
-                          </button>
+                          </motion.button>
                         )}
                         <Link
                           href={`/shared-prompts/${prompt.id}`}
@@ -869,12 +913,19 @@ export default function Marketplace() {
                         >
                           미리보기
                         </button>
-                        <button 
+                        <motion.button 
                           onClick={() => handleToggleFavorite(favorite.prompt.id)}
                           className="px-4 py-2 border border-red-300 text-red-700 rounded-xl hover:bg-red-50 transition-colors text-sm font-medium"
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          animate={favoriteAnimations[favorite.prompt.id] ? {
+                            scale: [1, 1.2, 1],
+                            rotate: [0, 5, -5, 0],
+                          } : {}}
+                          transition={{ duration: 0.3 }}
                         >
                           제거
-                        </button>
+                        </motion.button>
                       </div>
                     </div>
                   </motion.div>
@@ -1020,6 +1071,14 @@ export default function Marketplace() {
           onToggleFavorite={handleToggleFavorite}
         />
       )}
+
+      {/* Toast Notification */}
+      <Toast
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.isVisible}
+        onClose={hideToast}
+      />
     </div>
   );
 } 
