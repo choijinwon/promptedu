@@ -74,12 +74,24 @@ Prompt Hub는 고품질 프롬프트의 거래, 공유 플랫폼으로, 프롬�
 - 카테고리별 분류 (콘텐츠, 마케팅, 개발, 생산성, 비즈니스, 창작)
 - 평점 및 리뷰 시스템
 - 가격 비교 및 정렬
+- 구매 내역 관리
+
+### 공유 프롬프트
+- 무료 프롬프트 공유 플랫폼
+- 커뮤니티 기반 프롬프트 교환
+- 다운로드 및 평가 시스템
 
 ### 크리에이터 대시보드
 - 프롬프트 관리 (등록, 수정, 삭제)
 - 판매 통계 및 분석
 - 수익 현황 모니터링
 - 고객 피드백 관리
+
+### 관리자 기능
+- 프롬프트 승인/거부
+- 사용자 관리
+- 통계 및 분석
+- 시스템 모니터링
 
 ### 사용자 경험
 - 반응형 디자인 (모바일/데스크톱)
@@ -90,15 +102,100 @@ Prompt Hub는 고품질 프롬프트의 거래, 공유 플랫폼으로, 프롬�
 ## 🛠️ 기술 스택
 
 - **Frontend**: Next.js 15.2.4, React 18, TypeScript
+- **Backend**: Next.js API Routes, Prisma ORM
+- **Database**: PostgreSQL (Production), SQLite (Development)
 - **Styling**: Tailwind CSS
 - **Animation**: Framer Motion
 - **Icons**: Heroicons
 - **Forms**: React Hook Form, Zod
 - **UI Components**: Headless UI
+- **Authentication**: JWT, bcryptjs
+- **Deployment**: Vercel, Railway, or similar
+
+## 🚀 배포 가이드
+
+### 환경 설정
+
+1. **환경 변수 설정**
+   ```bash
+   # .env 파일 생성
+   cp env.example .env
+   ```
+
+2. **필수 환경 변수**
+   ```env
+   DATABASE_URL="postgresql://username:password@host:port/database"
+   JWT_SECRET="your-super-secret-jwt-key"
+   NEXTAUTH_URL="https://your-domain.com"
+   NEXTAUTH_SECRET="your-nextauth-secret"
+   ```
+
+### 배포 옵션
+
+#### 1. Vercel (권장)
+```bash
+# Vercel CLI 설치
+npm i -g vercel
+
+# 배포
+vercel
+```
+
+#### 2. Railway
+```bash
+# Railway CLI 설치
+npm i -g @railway/cli
+
+# 로그인 및 배포
+railway login
+railway init
+railway up
+```
+
+#### 3. Docker
+```dockerfile
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+COPY . .
+RUN npm run build
+EXPOSE 3000
+CMD ["npm", "start"]
+```
+
+### 데이터베이스 설정
+
+1. **PostgreSQL 설정**
+   ```bash
+   # 마이그레이션 실행
+   npx prisma migrate deploy
+   
+   # 데이터 시드
+   npx prisma db seed
+   ```
+
+2. **환경별 데이터베이스**
+   - Development: SQLite
+   - Production: PostgreSQL
+
+### 빌드 및 실행
+
+```bash
+# 의존성 설치
+npm install
+
+# 개발 서버
+npm run dev
+
+# 프로덕션 빌드
+npm run build
+
+# 프로덕션 서버
+npm start
+```
 
 ## 📁 프로젝트 구조
-
-```
 prompt-hub/
 ├── src/
 │   ├── app/
