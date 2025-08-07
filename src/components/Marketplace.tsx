@@ -7,6 +7,8 @@ import { StarIcon as StarIconSolid, HeartIcon as HeartIconSolid } from "@heroico
 import Link from "next/link";
 import PromptPreview from "./PromptPreview";
 import Toast from "./Toast";
+import CommentSection from "./CommentSection";
+import FollowButton from "./FollowButton";
 
 interface Prompt {
   id: string;
@@ -69,6 +71,7 @@ export default function Marketplace() {
     isVisible: false,
   });
   const [favoriteAnimations, setFavoriteAnimations] = useState<{ [key: string]: boolean }>({});
+  const [previewActiveTab, setPreviewActiveTab] = useState<'preview' | 'comments'>('preview');
 
   // 로그인 상태 확인
   useEffect(() => {
@@ -1078,6 +1081,7 @@ export default function Marketplace() {
           onPurchase={handlePurchase}
           isFavorite={favorites.some(fav => fav.promptId === selectedPrompt.id)}
           onToggleFavorite={handleToggleFavorite}
+          isLoggedIn={isLoggedIn}
         />
       )}
 

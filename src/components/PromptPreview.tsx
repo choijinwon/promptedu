@@ -4,6 +4,9 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { XMarkIcon, HeartIcon, ChatBubbleLeftIcon, ShareIcon } from "@heroicons/react/24/outline";
 import { HeartIcon as HeartIconSolid } from "@heroicons/react/24/solid";
+import CommentSection from "./CommentSection";
+import ShareButton from "./ShareButton";
+import FollowButton from "./FollowButton";
 
 interface PromptPreviewProps {
   prompt: {
@@ -24,12 +27,18 @@ interface PromptPreviewProps {
     views: number;
     tags: string[];
     createdAt: string;
+    user?: {
+      id: string;
+      name: string;
+      username: string;
+    };
   };
   isOpen: boolean;
   onClose: () => void;
   onPurchase: (promptId: string) => void;
   isFavorite?: boolean;
   onToggleFavorite?: (promptId: string) => void;
+  isLoggedIn?: boolean;
 }
 
 export default function PromptPreview({
@@ -39,9 +48,11 @@ export default function PromptPreview({
   onPurchase,
   isFavorite = false,
   onToggleFavorite,
+  isLoggedIn = false,
 }: PromptPreviewProps) {
   const [showFullContent, setShowFullContent] = useState(false);
   const [purchasing, setPurchasing] = useState(false);
+  const [activeTab, setActiveTab] = useState<'preview' | 'comments'>('preview');
 
   const handlePurchase = async () => {
     setPurchasing(true);
@@ -53,15 +64,18 @@ export default function PromptPreview({
   };
 
   const handleShare = () => {
-    if (navigator.share) {
-      navigator.share({
-        title: prompt.title,
-        text: prompt.description,
-        url: window.location.href,
-      });
+    const shareUrl = `${window.location.origin}/shared-prompts/${prompt.id}`;
+    const shareData = {
+      title: prompt.title,
+      text: prompt.description,
+      url: shareUrl,
+    };
+
+    if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+      navigator.share(shareData);
     } else {
       // Fallback: copy to clipboard
-      navigator.clipboard.writeText(window.location.href);
+      navigator.clipboard.writeText(shareUrl);
       alert("링크가 클립보드에 복사되었습니다.");
     }
   };
@@ -142,29 +156,67 @@ export default function PromptPreview({
                       )}
                     </button>
                   )}
-                  <button
-                    onClick={handleShare}
+                  <ShareButton
+                    title={prompt.title}
+                    description={prompt.description}
+                    url={`${window.location.origin}/shared-prompts/${prompt.id}`}
                     className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                  >
-                    <ShareIcon className="w-5 h-5 text-gray-400" />
-                  </button>
+                  />
+                  {prompt.user && (
+                    <FollowButton
+                      userId={prompt.user.id}
+                      username={prompt.user.username}
+                      isLoggedIn={isLoggedIn}
+                      className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                    />
+                  )}
                 </div>
               </div>
             </div>
 
             {/* Content */}
             <div className="p-6 overflow-y-auto max-h-[50vh]">
-              <div className="bg-gray-50 rounded-xl p-4 font-mono text-sm">
-                <pre className="whitespace-pre-wrap">{previewContent}</pre>
-              </div>
-              
-              {prompt.content.length > 300 && (
+              {/* 탭 네비게이션 */}
+              <div className="flex border-b border-gray-200 mb-4">
                 <button
-                  onClick={() => setShowFullContent(!showFullContent)}
-                  className="mt-4 text-blue-600 hover:text-blue-700 font-medium"
+                  onClick={() => setActiveTab('preview')}
+                  className={`px-4 py-2 font-medium transition-colors ${
+                    activeTab === 'preview'
+                      ? 'text-blue-600 border-b-2 border-blue-600'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
                 >
-                  {showFullContent ? "접기" : "더 보기"}
+                  미리보기
                 </button>
+                <button
+                  onClick={() => setActiveTab('comments')}
+                  className={`px-4 py-2 font-medium transition-colors ${
+                    activeTab === 'comments'
+                      ? 'text-blue-600 border-b-2 border-blue-600'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  댓글
+                </button>
+              </div>
+
+              {activeTab === 'preview' ? (
+                <>
+                  <div className="bg-gray-50 rounded-xl p-4 font-mono text-sm">
+                    <pre className="whitespace-pre-wrap">{previewContent}</pre>
+                  </div>
+                  
+                  {prompt.content.length > 300 && (
+                    <button
+                      onClick={() => setShowFullContent(!showFullContent)}
+                      className="mt-4 text-blue-600 hover:text-blue-700 font-medium"
+                    >
+                      {showFullContent ? "접기" : "더 보기"}
+                    </button>
+                  )}
+                </>
+              ) : (
+                <CommentSection promptId={prompt.id} isLoggedIn={isLoggedIn} />
               )}
             </div>
 
