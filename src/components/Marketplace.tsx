@@ -51,6 +51,13 @@ export default function Marketplace() {
   const [purchasing, setPurchasing] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"all" | "purchases">("all");
   const [purchases, setPurchases] = useState<any[]>([]);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // 로그인 상태 확인
+  useEffect(() => {
+    const token = localStorage.getItem("prompt_hub_token");
+    setIsLoggedIn(!!token);
+  }, []);
 
   // API에서 승인된 프롬프트 가져오기
   useEffect(() => {
@@ -263,16 +270,18 @@ export default function Marketplace() {
               >
                 전체 프롬프트
               </button>
-              <button
-                onClick={() => setActiveTab("purchases")}
-                className={`px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
-                  activeTab === "purchases"
-                    ? "bg-blue-600 text-white shadow-lg"
-                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                }`}
-              >
-                내 구매내역
-              </button>
+              {isLoggedIn && (
+                <button
+                  onClick={() => setActiveTab("purchases")}
+                  className={`px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
+                    activeTab === "purchases"
+                      ? "bg-blue-600 text-white shadow-lg"
+                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                  }`}
+                >
+                  내 구매내역
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -596,7 +605,31 @@ export default function Marketplace() {
         {/* Purchases Tab Content */}
         {activeTab === "purchases" && (
           <div className="space-y-6">
-            {purchases.length === 0 ? (
+            {!isLoggedIn ? (
+              <div className="text-center py-16">
+                <div className="w-24 h-24 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <svg className="w-12 h-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">로그인이 필요합니다</h3>
+                <p className="text-gray-600 mb-6">구매내역을 확인하려면 로그인해주세요</p>
+                <div className="flex justify-center gap-4">
+                  <Link 
+                    href="/login"
+                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    로그인하기
+                  </Link>
+                  <button 
+                    onClick={() => setActiveTab("all")}
+                    className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    프롬프트 둘러보기
+                  </button>
+                </div>
+              </div>
+            ) : purchases.length === 0 ? (
               <div className="text-center py-16">
                 <div className="w-24 h-24 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
                   <svg className="w-12 h-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
