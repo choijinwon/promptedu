@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json({
-      message: '즐겨찾기에 추가되었습니다.',
+      message: '💖 즐겨찾기에 추가되었습니다!',
       favorite,
     });
   } catch (error) {
@@ -129,7 +129,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     return NextResponse.json({
-      message: '즐겨찾기에서 제거되었습니다.',
+      message: '💔 즐겨찾기에서 삭제되었습니다.',
     });
   } catch (error) {
     console.error('Remove favorite error:', error);

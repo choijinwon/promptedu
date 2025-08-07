@@ -305,9 +305,9 @@ export default function Marketplace() {
 
         if (response.ok) {
           setFavorites(favorites.filter(fav => fav.promptId !== promptId));
-          showToast("즐겨찾기에서 제거되었습니다.", "success");
+          showToast("💔 즐겨찾기에서 삭제되었습니다.", "success");
         } else {
-          showToast(data.error || "즐겨찾기 제거에 실패했습니다.", "error");
+          showToast(data.error || "즐겨찾기 삭제에 실패했습니다.", "error");
         }
       } else {
         // 즐겨찾기 추가
@@ -324,7 +324,7 @@ export default function Marketplace() {
 
         if (response.ok) {
           setFavorites([...favorites, data.favorite]);
-          showToast("즐겨찾기에 추가되었습니다.", "success");
+          showToast("💖 즐겨찾기에 추가되었습니다!", "success");
         } else {
           showToast(data.error || "즐겨찾기 추가에 실패했습니다.", "error");
         }
@@ -933,7 +933,7 @@ export default function Marketplace() {
                           } : {}}
                           transition={{ duration: 0.3 }}
                         >
-                          제거
+                          💔 삭제
                         </motion.button>
                       </div>
                     </div>
