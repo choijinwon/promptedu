@@ -2,9 +2,10 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
-import { MagnifyingGlassIcon, FunnelIcon, StarIcon, ArrowDownTrayIcon, EyeIcon, FireIcon, SparklesIcon } from "@heroicons/react/24/outline";
-import { StarIcon as StarIconSolid } from "@heroicons/react/24/solid";
+import { MagnifyingGlassIcon, FunnelIcon, StarIcon, ArrowDownTrayIcon, EyeIcon, FireIcon, SparklesIcon, HeartIcon, ClockIcon } from "@heroicons/react/24/outline";
+import { StarIcon as StarIconSolid, HeartIcon as HeartIconSolid } from "@heroicons/react/24/solid";
 import Link from "next/link";
+import PromptPreview from "./PromptPreview";
 
 interface Prompt {
   id: string;
@@ -49,9 +50,14 @@ export default function Marketplace() {
   const [error, setError] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [purchasing, setPurchasing] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"all" | "purchases">("all");
+  const [activeTab, setActiveTab] = useState<"all" | "purchases" | "favorites">("all");
   const [purchases, setPurchases] = useState<any[]>([]);
+  const [favorites, setFavorites] = useState<any[]>([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [searchHistory, setSearchHistory] = useState<string[]>([]);
+  const [showSearchHistory, setShowSearchHistory] = useState(false);
+  const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
+  const [showPreview, setShowPreview] = useState(false);
 
   // 로그인 상태 확인
   useEffect(() => {
@@ -101,11 +107,80 @@ export default function Marketplace() {
     }
   };
 
+  // 즐겨찾기 가져오기
+  const fetchFavorites = async () => {
+    const token = localStorage.getItem("prompt_hub_token");
+    if (!token) return;
+
+    try {
+      const response = await fetch('/api/favorites', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setFavorites(data.favorites || []);
+      }
+    } catch (error) {
+      console.error('Failed to fetch favorites:', error);
+    }
+  };
+
+  // 검색 히스토리 가져오기
+  const fetchSearchHistory = async () => {
+    const token = localStorage.getItem("prompt_hub_token");
+    if (!token) return;
+
+    try {
+      const response = await fetch('/api/search-history', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setSearchHistory(data.searchHistory?.map((item: any) => item.query) || []);
+      }
+    } catch (error) {
+      console.error('Failed to fetch search history:', error);
+    }
+  };
+
+  // 검색 히스토리 저장
+  const saveSearchHistory = async (query: string) => {
+    const token = localStorage.getItem("prompt_hub_token");
+    if (!token || !query.trim()) return;
+
+    try {
+      await fetch('/api/search-history', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ query }),
+      });
+    } catch (error) {
+      console.error('Failed to save search history:', error);
+    }
+  };
+
   useEffect(() => {
     if (activeTab === "purchases") {
       fetchPurchases();
+    } else if (activeTab === "favorites") {
+      fetchFavorites();
     }
   }, [activeTab]);
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      fetchSearchHistory();
+    }
+  }, [isLoggedIn]);
 
   const filteredPrompts = useMemo(() => {
     return prompts.filter((prompt: Prompt) => {
@@ -186,6 +261,61 @@ export default function Marketplace() {
     } finally {
       setPurchasing(null);
     }
+  };
+
+  const handleToggleFavorite = async (promptId: string) => {
+    const token = localStorage.getItem("prompt_hub_token");
+    if (!token) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+
+    const isFavorite = favorites.some(fav => fav.promptId === promptId);
+
+    try {
+      if (isFavorite) {
+        // 즐겨찾기 제거
+        const response = await fetch(`/api/favorites?promptId=${promptId}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+
+        if (response.ok) {
+          setFavorites(favorites.filter(fav => fav.promptId !== promptId));
+        }
+      } else {
+        // 즐겨찾기 추가
+        const response = await fetch('/api/favorites', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ promptId }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setFavorites([...favorites, data.favorite]);
+        }
+      }
+    } catch (error) {
+      alert('즐겨찾기 처리 중 오류가 발생했습니다.');
+    }
+  };
+
+  const handleSearch = (query: string) => {
+    setSearchTerm(query);
+    if (isLoggedIn && query.trim()) {
+      saveSearchHistory(query);
+    }
+  };
+
+  const handlePreview = (prompt: Prompt) => {
+    setSelectedPrompt(prompt);
+    setShowPreview(true);
   };
 
   const renderStars = useMemo(() => {
@@ -282,6 +412,18 @@ export default function Marketplace() {
                   내 구매내역
                 </button>
               )}
+              {isLoggedIn && (
+                <button
+                  onClick={() => setActiveTab("favorites")}
+                  className={`px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
+                    activeTab === "favorites"
+                      ? "bg-blue-600 text-white shadow-lg"
+                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                  }`}
+                >
+                  즐겨찾기
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -294,13 +436,33 @@ export default function Marketplace() {
               <div className="lg:col-span-2">
                 <div className="relative">
                   <MagnifyingGlassIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="프롬프트 제목, 설명, 태그로 검색..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/50 backdrop-blur-sm"
-                  />
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="프롬프트 제목, 설명, 태그로 검색..."
+                      value={searchTerm}
+                      onChange={(e) => handleSearch(e.target.value)}
+                      onFocus={() => setShowSearchHistory(true)}
+                      className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/50 backdrop-blur-sm"
+                    />
+                    {showSearchHistory && isLoggedIn && searchHistory.length > 0 && (
+                      <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                        {searchHistory.slice(0, 5).map((query, index) => (
+                          <button
+                            key={index}
+                            onClick={() => {
+                              handleSearch(query);
+                              setShowSearchHistory(false);
+                            }}
+                            className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-2"
+                          >
+                            <ClockIcon className="w-4 h-4 text-gray-400" />
+                            {query}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -487,29 +649,51 @@ export default function Marketplace() {
 
                     {/* Actions */}
                     <div className="flex gap-2 pt-3 mt-auto">
-                      {prompt.price > 0 ? (
-                        <button 
-                          onClick={() => handlePurchase(prompt.id)}
-                          disabled={purchasing === prompt.id}
-                          className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 text-sm font-medium shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                      <div className="flex gap-2 flex-1">
+                        {prompt.price > 0 ? (
+                          <button 
+                            onClick={() => handlePurchase(prompt.id)}
+                            disabled={purchasing === prompt.id}
+                            className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 text-sm font-medium shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {purchasing === prompt.id ? "처리 중..." : "💎 구매하기"}
+                          </button>
+                        ) : (
+                          <button 
+                            onClick={() => handlePurchase(prompt.id)}
+                            disabled={purchasing === prompt.id}
+                            className="flex-1 px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all duration-200 text-sm font-medium shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {purchasing === prompt.id ? "다운로드 중..." : "🆓 무료 다운로드"}
+                          </button>
+                        )}
+                        <button
+                          onClick={() => handlePreview(prompt)}
+                          className="px-4 py-2 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 text-sm font-medium"
                         >
-                          {purchasing === prompt.id ? "처리 중..." : "💎 구매하기"}
+                          미리보기
                         </button>
-                      ) : (
-                        <button 
-                          onClick={() => handlePurchase(prompt.id)}
-                          disabled={purchasing === prompt.id}
-                          className="flex-1 px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all duration-200 text-sm font-medium shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                      </div>
+                      <div className="flex gap-1">
+                        {isLoggedIn && (
+                          <button
+                            onClick={() => handleToggleFavorite(prompt.id)}
+                            className="p-2 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-200"
+                          >
+                            {favorites.some(fav => fav.promptId === prompt.id) ? (
+                              <HeartIconSolid className="w-4 h-4 text-red-500" />
+                            ) : (
+                              <HeartIcon className="w-4 h-4 text-gray-400" />
+                            )}
+                          </button>
+                        )}
+                        <Link
+                          href={`/shared-prompts/${prompt.id}`}
+                          className="px-4 py-2 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 text-sm font-medium whitespace-nowrap"
                         >
-                          {purchasing === prompt.id ? "다운로드 중..." : "🆓 무료 다운로드"}
-                        </button>
-                      )}
-                      <Link
-                        href={`/shared-prompts/${prompt.id}`}
-                        className="px-4 py-2 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 text-sm font-medium whitespace-nowrap"
-                      >
-                        상세보기
-                      </Link>
+                          상세보기
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 ) : (
@@ -599,6 +783,104 @@ export default function Marketplace() {
                 )}
               </motion.div>
             ))}
+          </div>
+        )}
+
+        {/* Favorites Tab Content */}
+        {activeTab === "favorites" && (
+          <div className="space-y-6">
+            {!isLoggedIn ? (
+              <div className="text-center py-16">
+                <div className="w-24 h-24 bg-gradient-to-r from-red-100 to-pink-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <HeartIcon className="w-12 h-12 text-red-600" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">로그인이 필요합니다</h3>
+                <p className="text-gray-600 mb-6">즐겨찾기를 확인하려면 로그인해주세요</p>
+                <div className="flex justify-center gap-4">
+                  <Link 
+                    href="/login"
+                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    로그인하기
+                  </Link>
+                  <button 
+                    onClick={() => setActiveTab("all")}
+                    className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    프롬프트 둘러보기
+                  </button>
+                </div>
+              </div>
+            ) : favorites.length === 0 ? (
+              <div className="text-center py-16">
+                <div className="w-24 h-24 bg-gradient-to-r from-red-100 to-pink-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <HeartIcon className="w-12 h-12 text-red-600" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">즐겨찾기한 프롬프트가 없습니다</h3>
+                <p className="text-gray-600 mb-6">마켓플레이스에서 관심 있는 프롬프트를 즐겨찾기에 추가해보세요</p>
+                <button 
+                  onClick={() => setActiveTab("all")}
+                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  프롬프트 둘러보기
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {favorites.map((favorite) => (
+                  <motion.div
+                    key={favorite.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100"
+                  >
+                    <div className="p-6">
+                      <div className="flex items-center justify-between mb-4">
+                        <span className="px-3 py-1 bg-gradient-to-r from-red-100 to-pink-100 text-red-800 text-sm font-medium rounded-full">
+                          {favorite.prompt.category.icon} {favorite.prompt.category.name}
+                        </span>
+                        <span className="text-sm text-gray-500">
+                          추가일: {formatDate(favorite.createdAt)}
+                        </span>
+                      </div>
+                      
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
+                        {favorite.prompt.title}
+                      </h3>
+                      
+                      <p className="text-gray-600 mb-4 line-clamp-3">
+                        {favorite.prompt.description}
+                      </p>
+                      
+                      <div className="flex items-center justify-between mb-4">
+                        <span className="text-sm text-gray-500">
+                          작성자: {favorite.prompt.author.name}
+                        </span>
+                        <span className="text-lg font-bold text-green-600">
+                          {favorite.prompt.price === 0 ? "무료" : `₩${favorite.prompt.price.toLocaleString()}`}
+                        </span>
+                      </div>
+                      
+                      <div className="flex gap-2">
+                        <button 
+                          onClick={() => handlePreview(favorite.prompt)}
+                          className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors text-sm font-medium"
+                        >
+                          미리보기
+                        </button>
+                        <button 
+                          onClick={() => handleToggleFavorite(favorite.prompt.id)}
+                          className="px-4 py-2 border border-red-300 text-red-700 rounded-xl hover:bg-red-50 transition-colors text-sm font-medium"
+                        >
+                          제거
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
@@ -723,6 +1005,21 @@ export default function Marketplace() {
           </div>
         )}
       </div>
+
+      {/* Prompt Preview Modal */}
+      {selectedPrompt && (
+        <PromptPreview
+          prompt={selectedPrompt}
+          isOpen={showPreview}
+          onClose={() => {
+            setShowPreview(false);
+            setSelectedPrompt(null);
+          }}
+          onPurchase={handlePurchase}
+          isFavorite={favorites.some(fav => fav.promptId === selectedPrompt.id)}
+          onToggleFavorite={handleToggleFavorite}
+        />
+      )}
     </div>
   );
 } 

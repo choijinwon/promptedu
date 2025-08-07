@@ -36,6 +36,16 @@ model User {
   favorites Favorite[]
   creatorApplication CreatorApplication?
   reviewedApplications CreatorApplication[] @relation("CreatorApplicationReviewer")
+  
+  // New relations for social features
+  comments Comment[]
+  searchHistory SearchHistory[]
+  preference UserPreference?
+  notifications Notification[]
+  
+  // Follow relations
+  followers Follow[] @relation("UserFollowing")
+  following Follow[] @relation("UserFollowers")
 
   @@map("users")
 }
@@ -86,6 +96,7 @@ model Prompt {
   orders     Order[]
   reviews    Review[]
   favorites  Favorite[]
+  comments   Comment[]
 
   @@map("prompts")
 }
@@ -139,6 +150,81 @@ model Favorite {
   @@map("favorites")
 }
 
+model Comment {
+  id        String   @id @default(cuid())
+  userId    String
+  promptId  String
+  content   String
+  parentId  String?  // 대댓글을 위한 필드
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user    User    @relation(fields: [userId], references: [id])
+  prompt  Prompt  @relation(fields: [promptId], references: [id])
+  parent  Comment? @relation("CommentReplies", fields: [parentId], references: [id])
+  replies Comment[] @relation("CommentReplies")
+
+  @@map("comments")
+}
+
+model SearchHistory {
+  id        String   @id @default(cuid())
+  userId    String
+  query     String
+  createdAt DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("search_history")
+}
+
+model UserPreference {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  theme     String   @default("light") // light, dark
+  language  String   @default("ko")
+  notifications Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("user_preferences")
+}
+
+model Follow {
+  id          String   @id @default(cuid())
+  followerId  String   // 팔로우하는 사람
+  followingId String   // 팔로우 받는 사람
+  createdAt   DateTime @default(now())
+
+  // Relations
+  follower  User @relation("UserFollowers", fields: [followerId], references: [id])
+  following User @relation("UserFollowing", fields: [followingId], references: [id])
+
+  @@unique([followerId, followingId])
+  @@map("follows")
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      NotificationType
+  title     String
+  message   String
+  data      String?  // JSON string for additional data
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("notifications")
+}
+
 enum UserRole {
   USER
   CREATOR
@@ -189,4 +275,13 @@ enum OrderStatus {
   COMPLETED
   FAILED
   REFUNDED
+}
+
+enum NotificationType {
+  NEW_PROMPT
+  NEW_COMMENT
+  NEW_FOLLOWER
+  PROMPT_APPROVED
+  PROMPT_REJECTED
+  SYSTEM
 }
