@@ -2,6 +2,12 @@
   command = "npm run build:netlify"
   publish = ".next"
 
+# 개발 환경에서 API 라우트 테스트를 위한 설정
+[dev]
+  command = "npm run dev"
+  port = 3000
+  targetPort = 3000
+
 [build.environment]
   NODE_VERSION = "18"
   NODE_ENV = "production"

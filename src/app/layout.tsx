@@ -93,8 +93,8 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <head>
-        {/* Google Analytics */}
-        <script
+        {/* Google Analytics - 임시 비활성화 */}
+        {/* <script
           async
           src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"
         />
@@ -111,7 +111,7 @@ export default function RootLayout({
               });
             `,
           }}
-        />
+        /> */}
         {/* Google Search Console */}
         <meta name="google-site-verification" content="your-verification-code" />
         {/* Naver Webmaster Tools */}
