@@ -66,6 +66,7 @@ export async function POST(request: NextRequest) {
     const { password: _, ...userWithoutPassword } = user;
 
     console.log('Login successful for user:', user.email);
+    console.log('Returning response with token:', token ? 'TOKEN_EXISTS' : 'NO_TOKEN');
     return NextResponse.json({
       message: '로그인이 완료되었습니다.',
       user: userWithoutPassword,

@@ -41,12 +41,8 @@ export default function LoginPage() {
       localStorage.setItem("prompt_hub_token", data.token);
       console.log('Token saved to localStorage');
       
-      // 성공시 메인 페이지로 이동하고 새로고침
+      // 성공시 메인 페이지로 이동
       router.push("/");
-      // 페이지 새로고침으로 상태 업데이트
-      setTimeout(() => {
-        window.location.reload();
-      }, 100);
     } catch (err: any) {
       console.error('Login error:', err);
       setError(err.message || "로그인 중 오류 발생");

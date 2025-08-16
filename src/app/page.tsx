@@ -12,6 +12,8 @@ export default function HomePage() {
   useEffect(() => {
     const checkAuth = async () => {
       const token = localStorage.getItem("prompt_hub_token");
+      console.log('Checking auth with token:', token ? 'EXISTS' : 'NOT_FOUND');
+      
       if (token) {
         try {
           const response = await fetch("/api/auth/me", {
@@ -19,11 +21,15 @@ export default function HomePage() {
               Authorization: `Bearer ${token}`,
             },
           });
+          console.log('Auth check response status:', response.status);
+          
           if (response.ok) {
             const userData = await response.json();
+            console.log('Auth check user data:', userData);
             setUser(userData.user);
             setIsLoggedIn(true);
           } else {
+            console.log('Auth check failed, removing token');
             localStorage.removeItem("prompt_hub_token");
             setIsLoggedIn(false);
             setUser(null);
@@ -34,6 +40,8 @@ export default function HomePage() {
           setIsLoggedIn(false);
           setUser(null);
         }
+      } else {
+        console.log('No token found');
       }
       setLoading(false);
     };
