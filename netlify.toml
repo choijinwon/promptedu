@@ -28,8 +28,15 @@
   directory = ".next/server/app/api"
   node_bundler = "nft"
 
-# API 라우트 리다이렉트
+# API 라우트 리다이렉트 (더 구체적인 설정)
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/:splat"
+  status = 200
+  force = true
+
+# 추가 리다이렉트 규칙
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
   status = 200

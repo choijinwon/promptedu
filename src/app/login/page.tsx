@@ -25,6 +25,16 @@ export default function LoginPage() {
       });
       
       console.log('Login response status:', res.status);
+      console.log('Login response headers:', Object.fromEntries(res.headers.entries()));
+      
+      // 응답이 JSON인지 확인
+      const contentType = res.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        console.error('❌ Response is not JSON:', contentType);
+        const text = await res.text();
+        console.error('❌ Response text:', text.substring(0, 200));
+        throw new Error('서버에서 잘못된 응답을 받았습니다. API 엔드포인트를 확인해주세요.');
+      }
       
       const data = await res.json();
       console.log('Login response data:', data);
