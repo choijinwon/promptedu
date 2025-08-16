@@ -12,39 +12,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // 임시 토큰 처리
-    if (token === 'temp-token-for-testing') {
-      console.log('✅ Temporary token detected, returning test user');
-      return NextResponse.json({
-        user: {
-          id: 'temp-user-id',
-          email: 'a@test.com',
-          username: 'testuser',
-          name: '테스트 사용자',
-          role: 'USER',
-          isVerified: true,
-          createdAt: new Date().toISOString(),
-        },
-        isTemporary: true
-      });
-    }
 
-    // 임시 관리자 토큰 처리
-    if (token === 'temp-admin-token-for-testing') {
-      console.log('✅ Temporary admin token detected, returning admin user');
-      return NextResponse.json({
-        user: {
-          id: 'temp-admin-id',
-          email: 'admin@test.com',
-          username: 'admin',
-          name: '관리자',
-          role: 'ADMIN',
-          isVerified: true,
-          createdAt: new Date().toISOString(),
-        },
-        isTemporary: true
-      });
-    }
 
     const payload = verifyToken(token);
     if (!payload) {

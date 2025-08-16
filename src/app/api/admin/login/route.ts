@@ -20,8 +20,16 @@ export async function POST(request: NextRequest) {
     // 임시 관리자 로그인 (데이터베이스 연결 문제 해결 전까지)
     if (username === 'admin' && password === 'admin123') {
       console.log('✅ Temporary admin login successful');
+      
+      // 실제 JWT 토큰 생성
+      const token = generateToken({
+        userId: 'temp-admin-id',
+        email: 'admin@test.com',
+        role: 'ADMIN'
+      });
+      
       return NextResponse.json({
-        message: '임시 관리자 로그인이 완료되었습니다. (테스트 모드)',
+        message: '관리자 로그인이 완료되었습니다.',
         user: {
           id: 'temp-admin-id',
           email: 'admin@test.com',
@@ -30,8 +38,8 @@ export async function POST(request: NextRequest) {
           role: 'ADMIN',
           isVerified: true,
         },
-        token: 'temp-admin-token-for-testing',
-        isTemporary: true
+        token: token,
+        isTemporary: false
       });
     }
 

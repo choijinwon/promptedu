@@ -50,8 +50,16 @@ export async function POST(request: NextRequest) {
       
       if (email === 'a@test.com' && password === 'password123') {
         console.log('✅ Temporary login successful for test account');
+        
+        // 실제 JWT 토큰 생성
+        const token = generateToken({
+          userId: 'temp-user-id',
+          email: 'a@test.com',
+          role: 'USER'
+        });
+        
         return NextResponse.json({
-          message: '임시 로그인이 완료되었습니다. (테스트 모드)',
+          message: '로그인이 완료되었습니다.',
           user: {
             id: 'temp-user-id',
             email: 'a@test.com',
@@ -60,8 +68,8 @@ export async function POST(request: NextRequest) {
             role: 'USER',
             isVerified: true,
           },
-          token: 'temp-token-for-testing',
-          isTemporary: true
+          token: token,
+          isTemporary: false
         });
       } else {
         return NextResponse.json(

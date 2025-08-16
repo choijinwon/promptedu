@@ -11,34 +11,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // 임시 관리자 토큰 처리
-    if (token === 'temp-admin-token-for-testing') {
-      console.log('✅ Temporary admin token detected for dashboard');
-      return NextResponse.json({
-        stats: {
-          totalUsers: 150,
-          totalPrompts: 45,
-          pendingPrompts: 12,
-          totalRevenue: 250000,
-          monthlyRevenue: 45000,
-        },
-        recentActivity: [
-          {
-            id: '1',
-            type: 'prompt_created',
-            message: '새 프롬프트가 등록되었습니다.',
-            timestamp: new Date().toISOString(),
-          },
-          {
-            id: '2',
-            type: 'user_registered',
-            message: '새 사용자가 가입했습니다.',
-            timestamp: new Date(Date.now() - 3600000).toISOString(),
-          },
-        ],
-        isTemporary: true
-      });
-    }
+
 
     const payload = verifyToken(token);
     if (!payload) {
