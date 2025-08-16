@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { extractTokenFromHeader, verifyToken } from "@/lib/auth";
 
 // PUT /api/prompts/approve - 프롬프트 승인/거부

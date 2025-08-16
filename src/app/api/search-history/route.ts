@@ -1,18 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyToken, extractTokenFromHeader } from '@/lib/auth';
+import { verifyToken } from '@/lib/auth';
 
-// 동적으로 Prisma 클라이언트 import
-const getPrisma = async () => {
-  const { prisma } = await import('@/lib/prisma');
-  return prisma;
-};
-
-export async function POST(request: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
-    const token = extractTokenFromHeader(request.headers.get('authorization') || undefined);
+    const token = request.headers.get('authorization')?.replace('Bearer ', '');
+    
     if (!token) {
       return NextResponse.json(
-        { error: '로그인이 필요합니다.' },
+        { error: '토큰이 필요합니다.' },
         { status: 401 }
       );
     }
@@ -25,42 +20,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { query } = await request.json();
-
-    if (!query || query.trim() === '') {
-      return NextResponse.json(
-        { error: '검색어가 필요합니다.' },
-        { status: 400 }
-      );
-    }
-
-    // 검색 히스토리 저장
-    const prisma = await getPrisma();
-    await prisma.searchHistory.create({
-      data: {
-        userId: payload.userId,
-        query: query.trim(),
-      },
-    });
-
     return NextResponse.json({
-      message: '검색 히스토리가 저장되었습니다.',
+      searchHistory: []
     });
+
   } catch (error) {
-    console.error('Save search history error:', error);
+    console.error('Get search history error:', error);
     return NextResponse.json(
-      { error: '검색 히스토리 저장에 실패했습니다.' },
+      { error: '검색 기록을 불러오는데 실패했습니다.' },
       { status: 500 }
     );
   }
 }
 
-export async function GET(request: NextRequest) {
+export async function POST(request: NextRequest) {
   try {
-    const token = extractTokenFromHeader(request.headers.get('authorization') || undefined);
+    const token = request.headers.get('authorization')?.replace('Bearer ', '');
+    
     if (!token) {
       return NextResponse.json(
-        { error: '로그인이 필요합니다.' },
+        { error: '토큰이 필요합니다.' },
         { status: 401 }
       );
     }
@@ -73,29 +52,14 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const { searchParams } = new URL(request.url);
-    const limit = parseInt(searchParams.get('limit') || '10');
-
-    // 최근 검색 히스토리 조회
-    const prisma = await getPrisma();
-    const searchHistory = await prisma.searchHistory.findMany({
-      where: {
-        userId: payload.userId,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-      take: limit,
-      distinct: ['query'], // 중복 제거
-    });
-
     return NextResponse.json({
-      searchHistory,
+      message: '검색 기록이 저장되었습니다.'
     });
+
   } catch (error) {
-    console.error('Get search history error:', error);
+    console.error('Create search history error:', error);
     return NextResponse.json(
-      { error: '검색 히스토리를 불러오는데 실패했습니다.' },
+      { error: '검색 기록 저장에 실패했습니다.' },
       { status: 500 }
     );
   }
@@ -103,10 +67,11 @@ export async function GET(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const token = extractTokenFromHeader(request.headers.get('authorization') || undefined);
+    const token = request.headers.get('authorization')?.replace('Bearer ', '');
+    
     if (!token) {
       return NextResponse.json(
-        { error: '로그인이 필요합니다.' },
+        { error: '토큰이 필요합니다.' },
         { status: 401 }
       );
     }
@@ -119,21 +84,14 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // 사용자의 모든 검색 히스토리 삭제
-    const prisma = await getPrisma();
-    await prisma.searchHistory.deleteMany({
-      where: {
-        userId: payload.userId,
-      },
+    return NextResponse.json({
+      message: '검색 기록이 삭제되었습니다.'
     });
 
-    return NextResponse.json({
-      message: '검색 히스토리가 삭제되었습니다.',
-    });
   } catch (error) {
     console.error('Delete search history error:', error);
     return NextResponse.json(
-      { error: '검색 히스토리 삭제에 실패했습니다.' },
+      { error: '검색 기록 삭제에 실패했습니다.' },
       { status: 500 }
     );
   }

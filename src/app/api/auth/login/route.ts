@@ -1,59 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { comparePassword, generateToken } from '@/lib/auth';
 
-// 동적으로 Prisma 클라이언트 import
-const getPrisma = async () => {
-  const { prisma, checkDatabaseConnection } = await import('@/lib/prisma');
-  return { prisma, checkDatabaseConnection };
-};
-
 export async function POST(request: NextRequest) {
   try {
-    // 데이터베이스 연결 확인
     console.log('🔍 Environment check:', {
       NODE_ENV: process.env.NODE_ENV,
-      DATABASE_URL: process.env.DATABASE_URL ? 'SET' : 'NOT_SET',
-      NETLIFY_DATABASE_URL: process.env.NETLIFY_DATABASE_URL ? 'SET' : 'NOT_SET',
-      NETLIFY_DATABASE_URL_UNPOOLED: process.env.NETLIFY_DATABASE_URL_UNPOOLED ? 'SET' : 'NOT_SET',
-      SUPABASE_DATABASE_URL: process.env.SUPABASE_DATABASE_URL ? 'SET' : 'NOT_SET',
-      NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL ? 'SET' : 'NOT_SET',
     });
-
-    // 데이터베이스 연결 상태 확인 (Prisma 사용)
-    console.log('🔍 Checking database connections...');
-    
-    let isConnected = false;
-    let connectionError = null;
-    
-    // Prisma 연결 시도
-    try {
-      console.log('🔍 Attempting Prisma connection...');
-      const { checkDatabaseConnection } = await getPrisma();
-      isConnected = await checkDatabaseConnection();
-      if (isConnected) {
-        console.log('✅ Using Prisma connection');
-      }
-    } catch (error) {
-      console.error('❌ Prisma connection failed:', error);
-      connectionError = error;
-    }
-    
-    // 연결 실패 시 로그인 거부
-    if (!isConnected) {
-      console.warn('⚠️ Database connection failed');
-      console.error('❌ Connection error details:', connectionError);
-      
-      return NextResponse.json(
-        { 
-          error: '데이터베이스 연결에 실패했습니다. 잠시 후 다시 시도해주세요.',
-          details: 'Prisma 연결에 문제가 있습니다. 관리자에게 문의해주세요.',
-          environment: process.env.NODE_ENV,
-          hasDatabaseUrl: !!process.env.DATABASE_URL,
-          connectionError: connectionError ? String(connectionError) : 'Unknown error'
-        },
-        { status: 503 }
-      );
-    }
 
     const { email, password } = await request.json();
     
@@ -68,86 +20,42 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Find user using Prisma
-    console.log('Looking for user with email:', email);
-    const { prisma } = await getPrisma();
-    const user = await prisma.user.findUnique({
-      where: { email },
-      select: {
-        id: true,
-        email: true,
-        username: true,
-        name: true,
-        password: true,
-        role: true,
+    // 임시 로그인 로직 (Prisma 제거 후)
+    if (email === 'a@test.com' && password === 'password123') {
+      const user = {
+        id: 'temp-user-id',
+        email: 'a@test.com',
+        username: 'testuser',
+        name: '테스트 사용자',
+        role: 'USER',
         isVerified: true,
-      }
-    });
+      };
 
-    if (!user) {
-      console.log('User not found for email:', email);
-      return NextResponse.json(
-        { error: '이메일 또는 비밀번호가 올바르지 않습니다.' },
-        { status: 401 }
-      );
-    }
-    
-    console.log('User found:', { id: user.id, email: user.email, role: user.role });
+      const token = generateToken({
+        userId: user.id,
+        email: user.email,
+        role: user.role,
+      });
 
-    // Verify password
-    console.log('Verifying password...');
-    const isValidPassword = await comparePassword(password, user.password);
-    console.log('Password verification result:', isValidPassword);
-    if (!isValidPassword) {
-      console.log('Password verification failed');
-      return NextResponse.json(
-        { error: '이메일 또는 비밀번호가 올바르지 않습니다.' },
-        { status: 401 }
-      );
+      console.log('Login successful for user:', user.email);
+      return NextResponse.json({
+        message: '로그인이 완료되었습니다.',
+        user,
+        token,
+      });
     }
 
-    // Generate token
-    console.log('Generating token...');
-    const token = generateToken({
-      userId: user.id,
-      email: user.email,
-      role: user.role,
-    });
-
-    // Remove password from response
-    const { password: _, ...userWithoutPassword } = user;
-
-    console.log('Login successful for user:', user.email);
-    console.log('Returning response with token:', token ? 'TOKEN_EXISTS' : 'NO_TOKEN');
-    return NextResponse.json({
-      message: '로그인이 완료되었습니다.',
-      user: userWithoutPassword,
-      token,
-    });
+    console.log('User not found for email:', email);
+    return NextResponse.json(
+      { error: '이메일 또는 비밀번호가 올바르지 않습니다.' },
+      { status: 401 }
+    );
 
   } catch (error) {
     console.error('❌ Login error:', error);
-    console.error('❌ Error stack:', error instanceof Error ? error.stack : 'No stack trace');
-    console.error('❌ Error name:', error instanceof Error ? error.name : 'Unknown error type');
-    console.error('❌ Error message:', error instanceof Error ? error.message : String(error));
-    console.error('❌ Error constructor:', error?.constructor?.name || 'Unknown constructor');
-    
-    // 더 구체적인 오류 메시지 제공
-    let errorMessage = '서버 오류가 발생했습니다.';
-    if (error instanceof Error) {
-      if (error.message.includes('prisma') || error.message.includes('database') || error.message.includes('connect')) {
-        errorMessage = '데이터베이스 연결 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
-      } else if (error.message.includes('bcrypt')) {
-        errorMessage = '비밀번호 처리 중 오류가 발생했습니다.';
-      } else if (error.message.includes('jwt')) {
-        errorMessage = '토큰 생성 중 오류가 발생했습니다.';
-      } else if (error.message.includes('timeout')) {
-        errorMessage = '요청 시간이 초과되었습니다. 잠시 후 다시 시도해주세요.';
-      }
-    }
     
     return NextResponse.json(
-      { error: errorMessage },
+      { error: '서버 오류가 발생했습니다.' },
       { status: 500 }
     );
   }

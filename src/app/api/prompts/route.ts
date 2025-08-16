@@ -1,12 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken, extractTokenFromHeader } from '@/lib/auth';
 
-// 동적으로 Prisma 클라이언트 import
-const getPrisma = async () => {
-  const { prisma } = await import('@/lib/prisma');
-  return prisma;
-};
-
 // GET /api/prompts - 프롬프트 목록 조회
 export async function GET(request: NextRequest) {
   try {
@@ -21,14 +15,11 @@ export async function GET(request: NextRequest) {
 
     console.log('🔍 Fetching prompts with params:', { page, limit, category, search, status, sortBy, sortOrder });
 
-    // 실제 데이터베이스에서 프롬프트 조회
-    const prisma = await getPrisma();
-    
-    // 현재는 User 테이블만 있으므로 빈 배열 반환
+    // 현재는 빈 배열 반환
     const prompts = [];
     const total = 0;
 
-    console.log('✅ Returning prompts from database:', { total, page, limit, returned: prompts.length });
+    console.log('✅ Returning prompts:', { total, page, limit, returned: prompts.length });
 
     return NextResponse.json({
       prompts: prompts,

@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 
 // GET /api/shared-prompts - 공유 프롬프트 목록 조회 (무료만)
 export async function GET(request: NextRequest) {

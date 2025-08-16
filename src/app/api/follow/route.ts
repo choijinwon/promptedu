@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 import { verifyToken, extractTokenFromHeader } from '@/lib/auth';
 
 // 팔로우하기
