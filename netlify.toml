@@ -9,7 +9,6 @@
   PRISMA_CLI_QUERY_ENGINE_TYPE = "binary"
   PRISMA_CLIENT_ENGINE_TYPE = "binary"
   PRISMA_CLIENT_ENGINE_TYPE_BINARY = "true"
-  PRISMA_CLI_BINARY_TARGETS = "native"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
