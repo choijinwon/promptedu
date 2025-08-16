@@ -24,8 +24,8 @@ export default function LoginPage() {
       if (!res.ok) throw new Error(data.error || "로그인 실패");
       // JWT 저장 (localStorage)
       localStorage.setItem("prompt_hub_token", data.token);
-      // 성공시 글쓰기 페이지로 이동
-      router.push("/write");
+      // 성공시 메인 페이지로 이동
+      router.push("/");
     } catch (err: any) {
       setError(err.message || "로그인 중 오류 발생");
     } finally {
