@@ -14,19 +14,37 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     setError("");
+    
+    console.log('Attempting login with:', { email, password: password ? '[HIDDEN]' : 'MISSING' });
+    
     try {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
+      
+      console.log('Login response status:', res.status);
+      
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "로그인 실패");
+      console.log('Login response data:', data);
+      
+      if (!res.ok) {
+        throw new Error(data.error || `로그인 실패 (${res.status})`);
+      }
+      
+      if (!data.token) {
+        throw new Error("토큰이 없습니다. 서버 오류가 발생했습니다.");
+      }
+      
       // JWT 저장 (localStorage)
       localStorage.setItem("prompt_hub_token", data.token);
+      console.log('Token saved to localStorage');
+      
       // 성공시 메인 페이지로 이동
       router.push("/");
     } catch (err: any) {
+      console.error('Login error:', err);
       setError(err.message || "로그인 중 오류 발생");
     } finally {
       setLoading(false);

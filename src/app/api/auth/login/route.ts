@@ -78,8 +78,21 @@ export async function POST(request: NextRequest) {
       message: error instanceof Error ? error.message : 'Unknown error',
       stack: error instanceof Error ? error.stack : undefined
     });
+    
+    // 더 구체적인 오류 메시지 제공
+    let errorMessage = '서버 오류가 발생했습니다.';
+    if (error instanceof Error) {
+      if (error.message.includes('prisma')) {
+        errorMessage = '데이터베이스 연결 오류가 발생했습니다.';
+      } else if (error.message.includes('bcrypt')) {
+        errorMessage = '비밀번호 처리 중 오류가 발생했습니다.';
+      } else if (error.message.includes('jwt')) {
+        errorMessage = '토큰 생성 중 오류가 발생했습니다.';
+      }
+    }
+    
     return NextResponse.json(
-      { error: '서버 오류가 발생했습니다.' },
+      { error: errorMessage },
       { status: 500 }
     );
   }

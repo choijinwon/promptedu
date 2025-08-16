@@ -3,6 +3,13 @@ import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret';
 
+// JWT_SECRET 확인 로그
+if (!process.env.JWT_SECRET) {
+  console.warn('⚠️ JWT_SECRET environment variable is not set. Using fallback secret.');
+} else {
+  console.log('✅ JWT_SECRET is configured');
+}
+
 export interface JWTPayload {
   userId: string;
   email: string;
