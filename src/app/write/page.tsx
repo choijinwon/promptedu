@@ -49,7 +49,7 @@ export default function WritePage() {
       categoryId: "",
       tags: "",
       isPublic: true,
-      type: 'MARKETPLACE',
+      type: 'SHARED',
     }
   });
 
@@ -193,7 +193,14 @@ export default function WritePage() {
       }
       
       console.log('✅ Prompt registration successful');
-      setSuccess("프롬프트가 등록되었습니다! 관리자 승인 후 공개됩니다. 3초 후 메인 페이지로 이동합니다.");
+      
+      // 타입에 따라 다른 성공 메시지 표시
+      if (data.type === 'MARKETPLACE') {
+        setSuccess("유료 프롬프트가 등록되었습니다! 관리자 승인 후 마켓플레이스에 등록됩니다. 3초 후 메인 페이지로 이동합니다.");
+      } else {
+        setSuccess("무료 프롬프트가 등록되었습니다! 공개 설정에 따라 즉시 공유됩니다. 3초 후 메인 페이지로 이동합니다.");
+      }
+      
       reset();
       
       // 3초 후 메인 페이지로 이동
@@ -383,24 +390,24 @@ export default function WritePage() {
               <input
                 type="radio"
                 {...register("type")}
-                value="MARKETPLACE"
+                value="SHARED"
                 className="mr-2"
                 defaultChecked
               />
-              <span className="text-sm">마켓플레이스</span>
+              <span className="text-sm">무료 공유 프롬프트</span>
             </label>
             <label className="flex items-center">
               <input
                 type="radio"
                 {...register("type")}
-                value="SHARED"
+                value="MARKETPLACE"
                 className="mr-2"
               />
-              <span className="text-sm">공유 프롬프트 (무료)</span>
+              <span className="text-sm">유료 마켓플레이스 프롬프트</span>
             </label>
           </div>
           <p className="text-xs text-gray-500 mt-1">
-            마켓플레이스: 유료/무료 판매 가능. 공유 프롬프트: 무료로만 공유됩니다.
+            무료 공유: 즉시 공개/비공개 설정 가능 | 유료 마켓플레이스: 관리자 승인 후 판매
           </p>
         </div>
 

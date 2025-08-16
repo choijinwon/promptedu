@@ -158,20 +158,26 @@ export async function POST(request: NextRequest) {
         }
       }
 
+      // 타입에 따라 다른 상태 설정
+      const isMarketplace = type === 'MARKETPLACE';
+      const finalPrice = isMarketplace ? price : 0;
+      const finalStatus = isMarketplace ? 'PENDING' : (isPublic ? 'APPROVED' : 'DRAFT');
+      const finalIsApproved = isMarketplace ? false : isPublic;
+
       const { data: prompt, error: insertError } = await supabase
         .from('prompts')
         .insert({
           title: title.trim(),
           description: description.trim(),
           content: content.trim(),
-          price: type === 'SHARED' ? 0 : price, // 타입에 따라 가격 설정
+          price: finalPrice,
           category_id: finalCategoryId,
           author_id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890', // a@test.com 사용자 ID
           tags: Array.isArray(tags) ? tags : (tags ? [tags] : []),
-          type: type, // 폼에서 선택한 타입 사용
-          is_public: true, // 공개로 설정
-          is_approved: false, // 관리자 승인 필요
-          status: 'PENDING'
+          type: type,
+          is_public: isPublic,
+          is_approved: finalIsApproved,
+          status: finalStatus
         })
         .select('id, title, description, price, type, is_public, status, created_at')
         .single();
@@ -181,16 +187,25 @@ export async function POST(request: NextRequest) {
         throw new Error('프롬프트 테이블에 등록 실패');
       }
 
-      console.log('✅ Shared prompt created successfully:', {
+      console.log('✅ Prompt created successfully:', {
         id: prompt.id,
         title: prompt.title,
         author: user.username,
         type: prompt.type,
-        price: prompt.price
+        price: prompt.price,
+        status: prompt.status,
+        is_public: prompt.is_public
       });
 
+      // 타입에 따라 다른 메시지 생성
+      const message = isMarketplace 
+        ? '유료 프롬프트가 등록되었습니다. 관리자 승인 후 마켓플레이스에 등록됩니다.'
+        : (isPublic 
+          ? '무료 프롬프트가 등록되었습니다. 즉시 공유됩니다.'
+          : '무료 프롬프트가 등록되었습니다. 비공개로 저장되었습니다.');
+
       return NextResponse.json({
-        message: '공유 프롬프트가 등록되었습니다. 관리자 승인 후 공개됩니다.',
+        message: message,
         prompt: {
           id: prompt.id,
           title: prompt.title,
