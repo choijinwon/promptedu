@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 // 환경변수 검증
 if (!supabaseUrl || !supabaseKey) {
@@ -11,8 +12,8 @@ if (!supabaseUrl || !supabaseKey) {
   throw new Error('Supabase environment variables are required');
 }
 
-// Supabase 클라이언트 생성 (더 안전한 설정)
-export const supabase = createClient(supabaseUrl, supabaseKey, {
+// Supabase 클라이언트 생성 (서비스 롤 키 사용)
+export const supabase = createClient(supabaseUrl, serviceRoleKey || supabaseKey, {
   auth: {
     autoRefreshToken: false,
     persistSession: false
@@ -27,7 +28,7 @@ export const checkSupabaseConnection = async () => {
   try {
     console.log('🔍 Testing Supabase connection...');
     console.log('🔍 Supabase URL:', supabaseUrl ? 'SET' : 'NOT_SET');
-    console.log('🔍 Supabase Key:', supabaseKey ? 'SET' : 'NOT_SET');
+    console.log('🔍 Service Role Key:', serviceRoleKey ? 'SET' : 'NOT_SET');
     
     // 간단한 연결 테스트 - 시스템 정보 조회
     const { data, error } = await supabase
