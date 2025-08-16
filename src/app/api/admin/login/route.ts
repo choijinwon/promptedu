@@ -17,6 +17,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // 임시 관리자 로그인 (데이터베이스 연결 문제 해결 전까지)
+    if (username === 'admin' && password === 'admin123') {
+      console.log('✅ Temporary admin login successful');
+      return NextResponse.json({
+        message: '임시 관리자 로그인이 완료되었습니다. (테스트 모드)',
+        user: {
+          id: 'temp-admin-id',
+          email: 'admin@test.com',
+          username: 'admin',
+          name: '관리자',
+          role: 'ADMIN',
+          isVerified: true,
+        },
+        token: 'temp-admin-token-for-testing',
+        isTemporary: true
+      });
+    }
+
     // Find user by username
     console.log('Looking for user with username:', username);
     const user = await prisma.user.findUnique({

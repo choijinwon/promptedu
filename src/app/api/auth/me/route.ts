@@ -29,6 +29,23 @@ export async function GET(request: NextRequest) {
       });
     }
 
+    // 임시 관리자 토큰 처리
+    if (token === 'temp-admin-token-for-testing') {
+      console.log('✅ Temporary admin token detected, returning admin user');
+      return NextResponse.json({
+        user: {
+          id: 'temp-admin-id',
+          email: 'admin@test.com',
+          username: 'admin',
+          name: '관리자',
+          role: 'ADMIN',
+          isVerified: true,
+          createdAt: new Date().toISOString(),
+        },
+        isTemporary: true
+      });
+    }
+
     const payload = verifyToken(token);
     if (!payload) {
       return NextResponse.json(
