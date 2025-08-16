@@ -14,10 +14,13 @@
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
+# Next.js App Router를 위한 설정
 [functions]
-  directory = ".next/functions"
+  directory = ".next/server/app/api"
+  node_bundler = "nft"
 
+# API 라우트 리다이렉트
 [[redirects]]
-  from = "/*"
-  to = "/index.html"
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
   status = 200
