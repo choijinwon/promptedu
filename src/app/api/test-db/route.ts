@@ -16,8 +16,8 @@ export async function GET(request: NextRequest) {
       hasSupabaseKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
     },
     connections: {
-      prisma: null,
-      supabase: null
+      prisma: null as boolean | null,
+      supabase: null as boolean | null
     },
     errors: []
   };
