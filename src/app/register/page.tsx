@@ -16,6 +16,9 @@ export default function RegisterPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [registeredEmail, setRegisteredEmail] = useState("");
+  const [showResendForm, setShowResendForm] = useState(false);
+  const [isResending, setIsResending] = useState(false);
+  const [resendResult, setResendResult] = useState<any>(null);
   const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -70,6 +73,43 @@ export default function RegisterPage() {
     }
   };
 
+  const handleResendVerification = async () => {
+    if (!registeredEmail) {
+      alert('이메일 주소가 없습니다.');
+      return;
+    }
+
+    setIsResending(true);
+    setResendResult(null);
+
+    try {
+      const response = await fetch('/api/auth/resend-verification', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: registeredEmail
+        }),
+      });
+
+      const data = await response.json();
+      setResendResult(data);
+      
+      if (response.ok) {
+        alert('재인증 이메일이 발송되었습니다. 이메일을 확인해주세요.');
+        setShowResendForm(false);
+      } else {
+        alert(data.error || '이메일 재발송에 실패했습니다.');
+      }
+    } catch (error) {
+      setResendResult({ error: '재발송 중 오류가 발생했습니다.' });
+      alert('이메일 재발송 중 오류가 발생했습니다.');
+    } finally {
+      setIsResending(false);
+    }
+  };
+
   if (success) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 via-white to-blue-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
@@ -93,6 +133,63 @@ export default function RegisterPage() {
                 <li>3. 인증 완료 후 로그인하실 수 있습니다</li>
               </ol>
             </div>
+
+            {/* 이메일 재인증 섹션 */}
+            {!showResendForm ? (
+              <div className="mb-6">
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                  이메일을 받지 못하셨나요?
+                </p>
+                <button
+                  onClick={() => setShowResendForm(true)}
+                  className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  📧 재인증 이메일 받기
+                </button>
+              </div>
+            ) : (
+              <div className="mb-6 border-t pt-4">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">📧 이메일 재인증</h3>
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      재인증할 이메일 주소
+                    </label>
+                    <input
+                      type="email"
+                      value={registeredEmail}
+                      readOnly
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    />
+                  </div>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={handleResendVerification}
+                      disabled={isResending}
+                      className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+                    >
+                      {isResending ? '재발송 중...' : '📧 재인증 이메일 발송'}
+                    </button>
+                    <button
+                      onClick={() => setShowResendForm(false)}
+                      className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+                    >
+                      취소
+                    </button>
+                  </div>
+                </div>
+                
+                {/* 재발송 결과 */}
+                {resendResult && (
+                  <div className="mt-3 bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+                    <h4 className="font-semibold text-gray-900 dark:text-white mb-1">재발송 결과:</h4>
+                    <pre className="text-xs text-gray-600 dark:text-gray-400 whitespace-pre-wrap overflow-auto">
+                      {JSON.stringify(resendResult, null, 2)}
+                    </pre>
+                  </div>
+                )}
+              </div>
+            )}
 
             <div className="space-y-3">
               <button

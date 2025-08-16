@@ -14,6 +14,7 @@ function VerifyEmailContent() {
   const [resendEmail, setResendEmail] = useState('');
   const [isResending, setIsResending] = useState(false);
   const [resendResult, setResendResult] = useState<any>(null);
+  const [showResendForm, setShowResendForm] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -66,7 +67,7 @@ function VerifyEmailContent() {
     setResendResult(null);
 
     try {
-      const response = await fetch('/api/auth/resend-email', {
+      const response = await fetch('/api/auth/resend-verification', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -80,7 +81,8 @@ function VerifyEmailContent() {
       setResendResult(data);
       
       if (response.ok) {
-        alert('인증 이메일이 재발송되었습니다. 이메일을 확인해주세요.');
+        alert('재인증 이메일이 발송되었습니다. 이메일을 확인해주세요.');
+        setShowResendForm(false);
       } else {
         alert(data.error || '이메일 재발송에 실패했습니다.');
       }
@@ -237,31 +239,53 @@ function VerifyEmailContent() {
           <p className="text-gray-600 dark:text-gray-400 mb-6">{message}</p>
         </div>
 
-        {/* 이메일 재발송 섹션 */}
+        {/* 이메일 재인증 섹션 */}
         <div className="border-t pt-6">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">📧 이메일 재발송</h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">📧 이메일 재인증</h2>
           
-          <div className="space-y-4 mb-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                재발송할 이메일 주소
-              </label>
-              <input
-                type="email"
-                value={resendEmail}
-                onChange={(e) => setResendEmail(e.target.value)}
-                placeholder="your-email@example.com"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              />
+          {!showResendForm ? (
+            <div className="text-center mb-4">
+              <p className="text-gray-600 dark:text-gray-400 mb-4">
+                이메일을 받지 못하셨나요? 재인증 이메일을 다시 받을 수 있습니다.
+              </p>
+              <button
+                onClick={() => setShowResendForm(true)}
+                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                📧 재인증 이메일 받기
+              </button>
             </div>
-            <button
-              onClick={handleResendEmail}
-              disabled={isResending || !resendEmail}
-              className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
-            >
-              {isResending ? '재발송 중...' : '📧 인증 이메일 재발송'}
-            </button>
-          </div>
+          ) : (
+            <div className="space-y-4 mb-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  재인증할 이메일 주소
+                </label>
+                <input
+                  type="email"
+                  value={resendEmail}
+                  onChange={(e) => setResendEmail(e.target.value)}
+                  placeholder="your-email@example.com"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                />
+              </div>
+              <div className="flex space-x-3">
+                <button
+                  onClick={handleResendEmail}
+                  disabled={isResending || !resendEmail}
+                  className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+                >
+                  {isResending ? '재발송 중...' : '📧 재인증 이메일 발송'}
+                </button>
+                <button
+                  onClick={() => setShowResendForm(false)}
+                  className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+                >
+                  취소
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* 재발송 결과 */}
           {resendResult && (
