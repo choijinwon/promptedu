@@ -1,11 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { comparePassword, generateToken } from '@/lib/auth';
+import { checkSupabaseConnection } from '@/lib/supabase-db';
 
 export async function POST(request: NextRequest) {
   try {
     console.log('🔍 Environment check:', {
       NODE_ENV: process.env.NODE_ENV,
+      SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL ? 'SET' : 'NOT_SET',
+      DATABASE_URL: process.env.DATABASE_URL ? 'SET' : 'NOT_SET',
     });
+
+    // Supabase 연결 확인
+    console.log('🔍 Checking Supabase connection...');
+    const isConnected = await checkSupabaseConnection();
+    
+    if (!isConnected) {
+      console.warn('⚠️ Supabase connection failed');
+      return NextResponse.json(
+        { 
+          error: '데이터베이스 연결에 실패했습니다. 잠시 후 다시 시도해주세요.',
+          details: 'Supabase 연결에 문제가 있습니다. 관리자에게 문의해주세요.',
+          environment: process.env.NODE_ENV,
+        },
+        { status: 503 }
+      );
+    }
 
     const { email, password } = await request.json();
     
@@ -20,7 +39,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 임시 로그인 로직 (Prisma 제거 후)
+    // 임시 로그인 로직 (Supabase 연결 확인 후)
     if (email === 'a@test.com' && password === 'password123') {
       const user = {
         id: 'temp-user-id',

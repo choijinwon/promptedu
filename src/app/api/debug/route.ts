@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { checkSupabaseConnection } from '@/lib/supabase-db';
 
 export async function GET(request: NextRequest) {
   try {
@@ -7,9 +8,24 @@ export async function GET(request: NextRequest) {
       environment: process.env.NODE_ENV,
       environmentVariables: {
         hasJwtSecret: !!process.env.JWT_SECRET,
+        hasSupabaseUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+        hasSupabaseKey: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+        hasDatabaseUrl: !!process.env.DATABASE_URL,
       },
-      errors: [],
+      supabaseTest: null as any,
+      errors: [] as string[]
     };
+
+    // Supabase 연결 테스트
+    try {
+      console.log('🔍 Testing Supabase connection in debug API...');
+      const isConnected = await checkSupabaseConnection();
+      debugInfo.supabaseTest = { success: isConnected };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      debugInfo.errors.push(`Supabase error: ${errorMessage}`);
+      debugInfo.supabaseTest = { error: errorMessage };
+    }
 
     console.log('🔍 Debug info:', debugInfo);
 
