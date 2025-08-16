@@ -15,14 +15,14 @@ export async function POST(request: NextRequest) {
       NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL ? 'SET' : 'NOT_SET',
     });
 
-    // 데이터베이스 연결 상태 확인 (Supabase 우선, Prisma는 백업)
+    // 데이터베이스 연결 상태 확인 (Supabase만 시도)
     console.log('🔍 Checking database connections...');
     
     let isConnected = false;
     let connectionMethod = 'none';
     let connectionError = null;
     
-    // 먼저 Supabase 연결 시도 (Netlify에서 더 안정적)
+    // Supabase 연결만 시도 (Netlify에서 더 안정적)
     try {
       console.log('🔍 Attempting Supabase connection...');
       isConnected = await checkSupabaseConnection();
@@ -38,26 +38,6 @@ export async function POST(request: NextRequest) {
         stack: error instanceof Error ? error.stack : 'No stack trace'
       });
       connectionError = error;
-    }
-    
-    // Supabase가 실패하면 Prisma 연결 시도
-    if (!isConnected) {
-      try {
-        console.log('🔍 Attempting Prisma connection...');
-        isConnected = await checkDatabaseConnection();
-        if (isConnected) {
-          connectionMethod = 'prisma';
-          console.log('✅ Using Prisma connection');
-        }
-      } catch (error) {
-        console.error('❌ Prisma connection also failed:', error);
-        console.error('❌ Prisma error details:', {
-          name: error instanceof Error ? error.name : 'Unknown',
-          message: error instanceof Error ? error.message : String(error),
-          stack: error instanceof Error ? error.stack : 'No stack trace'
-        });
-        connectionError = error;
-      }
     }
     
     // 연결 실패 시 임시 로그인 허용 (개발/테스트용)
@@ -113,24 +93,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Find user based on connection method
+    // Find user using Supabase
     console.log('Looking for user with email:', email);
     let user = null;
     
-    if (connectionMethod === 'prisma') {
-      user = await prisma.user.findUnique({
-        where: { email },
-        select: {
-          id: true,
-          email: true,
-          username: true,
-          name: true,
-          password: true,
-          role: true,
-          isVerified: true,
-        }
-      });
-    } else if (connectionMethod === 'supabase') {
+    if (connectionMethod === 'supabase') {
       // Supabase를 사용한 사용자 조회
       const { data, error } = await supabase
         .from('users')
