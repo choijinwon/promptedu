@@ -86,11 +86,11 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Login error:', error);
-    console.error('Error details:', {
-      message: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined
-    });
+    console.error('❌ Login error:', error);
+    console.error('❌ Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+    console.error('❌ Error name:', error instanceof Error ? error.name : 'Unknown error type');
+    console.error('❌ Error message:', error instanceof Error ? error.message : String(error));
+    console.error('❌ Error constructor:', error?.constructor?.name || 'Unknown constructor');
     
     // 더 구체적인 오류 메시지 제공
     let errorMessage = '서버 오류가 발생했습니다.';

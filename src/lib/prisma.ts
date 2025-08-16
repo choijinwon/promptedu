@@ -25,6 +25,13 @@ export const prisma = globalForPrisma.prisma ?? new PrismaClient({
       url: databaseUrl,
     },
   },
+  // 연결 타임아웃 설정
+  __internal: {
+    engine: {
+      connectTimeout: 20000, // 20초
+      queryTimeout: 30000,   // 30초
+    },
+  },
 })
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma 

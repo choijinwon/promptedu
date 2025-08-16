@@ -26,7 +26,15 @@ export const comparePassword = async (password: string, hashedPassword: string):
 };
 
 export const generateToken = (payload: JWTPayload): string => {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
+  try {
+    console.log('🔐 Generating JWT token for user:', payload.email);
+    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
+    console.log('✅ JWT token generated successfully');
+    return token;
+  } catch (error) {
+    console.error('❌ JWT token generation failed:', error);
+    throw new Error(`JWT 토큰 생성 실패: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 };
 
 export const verifyToken = (token: string): JWTPayload | null => {
