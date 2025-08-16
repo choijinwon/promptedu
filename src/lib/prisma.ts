@@ -30,16 +30,32 @@ export const prisma = globalForPrisma.prisma ?? new PrismaClient({
       url: databaseUrl,
     },
   },
+  // Netlify 환경을 위한 추가 설정
+  errorFormat: 'pretty',
 })
 
 // 연결 상태 확인 함수
 export const checkDatabaseConnection = async () => {
   try {
+    console.log('🔍 Attempting database connection...');
+    console.log('🔍 Database URL type:', databaseUrl ? 'SET' : 'NOT_SET');
+    console.log('🔍 Environment:', process.env.NODE_ENV);
+    
     await prisma.$connect();
     console.log('✅ Database connection check successful');
+    
+    // 간단한 쿼리로 연결 확인
+    const result = await prisma.$queryRaw`SELECT 1 as test`;
+    console.log('✅ Test query successful:', result);
+    
     return true;
   } catch (error) {
     console.error('❌ Database connection check failed:', error);
+    console.error('❌ Error details:', {
+      name: error instanceof Error ? error.name : 'Unknown',
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : 'No stack trace'
+    });
     return false;
   }
 }
