@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { comparePassword, generateToken } from '@/lib/auth';
-import { checkSupabaseConnection } from '@/lib/supabase-db';
+import { checkSupabaseConnection, getUserByEmail } from '@/lib/supabase-db';
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,22 +9,6 @@ export async function POST(request: NextRequest) {
       SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL ? 'SET' : 'NOT_SET',
       DATABASE_URL: process.env.DATABASE_URL ? 'SET' : 'NOT_SET',
     });
-
-    // Supabase 연결 확인
-    console.log('🔍 Checking Supabase connection...');
-    const isConnected = await checkSupabaseConnection();
-    
-    if (!isConnected) {
-      console.warn('⚠️ Supabase connection failed');
-      return NextResponse.json(
-        { 
-          error: '데이터베이스 연결에 실패했습니다. 잠시 후 다시 시도해주세요.',
-          details: 'Supabase 연결에 문제가 있습니다. 관리자에게 문의해주세요.',
-          environment: process.env.NODE_ENV,
-        },
-        { status: 503 }
-      );
-    }
 
     const { email, password } = await request.json();
     
@@ -39,7 +23,38 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 임시 로그인 로직 (Supabase 연결 확인 후)
+    // Supabase 연결 시도
+    console.log('🔍 Checking Supabase connection...');
+    const isConnected = await checkSupabaseConnection();
+    
+    if (isConnected) {
+      // Supabase 연결 성공 시 실제 데이터베이스에서 조회
+      console.log('✅ Using Supabase database');
+      
+      const user = await getUserByEmail(email);
+      if (user) {
+        const isValidPassword = await comparePassword(password, user.password);
+        if (isValidPassword) {
+          const token = generateToken({
+            userId: user.id,
+            email: user.email,
+            role: user.role,
+          });
+
+          const { password: _, ...userWithoutPassword } = user;
+          console.log('Login successful for user:', user.email);
+          return NextResponse.json({
+            message: '로그인이 완료되었습니다.',
+            user: userWithoutPassword,
+            token,
+          });
+        }
+      }
+    } else {
+      console.warn('⚠️ Supabase connection failed, using temporary login');
+    }
+
+    // Supabase 연결 실패 또는 사용자 없음 시 임시 로그인
     if (email === 'a@test.com' && password === 'password123') {
       const user = {
         id: 'temp-user-id',
@@ -56,9 +71,9 @@ export async function POST(request: NextRequest) {
         role: user.role,
       });
 
-      console.log('Login successful for user:', user.email);
+      console.log('Login successful for user (temporary):', user.email);
       return NextResponse.json({
-        message: '로그인이 완료되었습니다.',
+        message: '로그인이 완료되었습니다. (임시 로그인)',
         user,
         token,
       });

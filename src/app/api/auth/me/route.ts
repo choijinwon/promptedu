@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken } from '@/lib/auth';
+import { getUserById } from '@/lib/supabase-db';
 
 export async function GET(request: NextRequest) {
   try {
@@ -46,6 +47,19 @@ export async function GET(request: NextRequest) {
           isVerified: true,
         }
       });
+    }
+
+    // Supabase에서 사용자 정보 조회 시도
+    try {
+      const user = await getUserById(payload.userId);
+      if (user) {
+        const { password: _, ...userWithoutPassword } = user;
+        return NextResponse.json({
+          user: userWithoutPassword
+        });
+      }
+    } catch (error) {
+      console.error('Supabase user lookup failed:', error);
     }
 
     return NextResponse.json(

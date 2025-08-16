@@ -11,6 +11,8 @@ export async function GET(request: NextRequest) {
         hasSupabaseUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
         hasSupabaseKey: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
         hasDatabaseUrl: !!process.env.DATABASE_URL,
+        supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL ? 'SET' : 'NOT_SET',
+        supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'SET' : 'NOT_SET',
       },
       supabaseTest: null as any,
       errors: [] as string[]
@@ -24,7 +26,11 @@ export async function GET(request: NextRequest) {
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       debugInfo.errors.push(`Supabase error: ${errorMessage}`);
-      debugInfo.supabaseTest = { error: errorMessage };
+      debugInfo.supabaseTest = { 
+        error: errorMessage,
+        errorType: typeof error,
+        errorStack: error instanceof Error ? error.stack : undefined
+      };
     }
 
     console.log('🔍 Debug info:', debugInfo);

@@ -40,6 +40,7 @@ export const checkSupabaseConnection = async () => {
       console.error('❌ Error code:', error.code);
       console.error('❌ Error message:', error.message);
       console.error('❌ Error details:', error.details);
+      console.error('❌ Error hint:', error.hint);
       
       // 테이블이 없는 경우도 연결은 성공으로 간주
       if (error.code === 'PGRST116') {
