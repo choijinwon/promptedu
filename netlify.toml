@@ -2,6 +2,17 @@
   command = "npm run build:netlify"
   publish = ".next"
 
+# Next.js App Router를 위한 설정
+[functions]
+  directory = ".next/server/app/api"
+  node_bundler = "nft"
+
+# API 라우트 리다이렉트
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
 # 개발 환경에서 API 라우트 테스트를 위한 설정
 [dev]
   command = "npm run dev"
@@ -22,20 +33,3 @@
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
-
-# Next.js App Router를 위한 설정
-[functions]
-  directory = ".next/server/app/api"
-  node_bundler = "nft"
-
-# API 라우트 리다이렉트
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/:splat"
-  status = 200
-
-# SPA 리다이렉트
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
