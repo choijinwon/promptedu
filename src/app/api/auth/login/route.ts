@@ -61,7 +61,6 @@ export async function POST(request: NextRequest) {
           environment: process.env.NODE_ENV,
           hasDatabaseUrl: !!process.env.DATABASE_URL,
           hasNetlifyDatabaseUrl: !!process.env.NETLIFY_DATABASE_URL,
-          hasSupabaseDatabaseUrl: !!process.env.SUPABASE_DATABASE_URL,
           hasSupabaseUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
           hasSupabaseKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
           connectionError: connectionError ? String(connectionError) : 'Unknown error'
