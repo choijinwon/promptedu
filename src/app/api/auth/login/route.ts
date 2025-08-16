@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma, checkDatabaseConnection } from '@/lib/prisma';
+import { checkSupabaseConnection, getUserByEmail } from '@/lib/supabase-db';
 import { comparePassword, generateToken } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
@@ -14,18 +15,48 @@ export async function POST(request: NextRequest) {
       NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL ? 'SET' : 'NOT_SET',
     });
 
-    // 데이터베이스 연결 상태 확인
-    const isConnected = await checkDatabaseConnection();
+    // 데이터베이스 연결 상태 확인 (Prisma와 Supabase 모두 시도)
+    console.log('🔍 Checking database connections...');
+    
+    let isConnected = false;
+    let connectionMethod = 'none';
+    
+    // 먼저 Prisma 연결 시도
+    try {
+      isConnected = await checkDatabaseConnection();
+      if (isConnected) {
+        connectionMethod = 'prisma';
+        console.log('✅ Using Prisma connection');
+      }
+    } catch (error) {
+      console.log('❌ Prisma connection failed, trying Supabase...');
+    }
+    
+    // Prisma가 실패하면 Supabase 연결 시도
     if (!isConnected) {
-      console.error('❌ Database connection failed, returning detailed error');
+      try {
+        isConnected = await checkSupabaseConnection();
+        if (isConnected) {
+          connectionMethod = 'supabase';
+          console.log('✅ Using Supabase connection');
+        }
+      } catch (error) {
+        console.log('❌ Supabase connection also failed');
+      }
+    }
+    
+    if (!isConnected) {
+      console.error('❌ All database connections failed');
       return NextResponse.json(
         { 
           error: '데이터베이스 연결에 실패했습니다. 잠시 후 다시 시도해주세요.',
-          details: '환경 변수가 설정되지 않았거나 데이터베이스 연결에 문제가 있습니다.',
+          details: 'Prisma와 Supabase 연결 모두 실패했습니다.',
           environment: process.env.NODE_ENV,
           hasDatabaseUrl: !!process.env.DATABASE_URL,
           hasNetlifyDatabaseUrl: !!process.env.NETLIFY_DATABASE_URL,
-          hasSupabaseDatabaseUrl: !!process.env.SUPABASE_DATABASE_URL
+          hasSupabaseDatabaseUrl: !!process.env.SUPABASE_DATABASE_URL,
+          hasSupabaseUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+          hasSupabaseKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY
         },
         { status: 503 }
       );
@@ -44,20 +75,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Find user
+    // Find user based on connection method
     console.log('Looking for user with email:', email);
-    const user = await prisma.user.findUnique({
-      where: { email },
-      select: {
-        id: true,
-        email: true,
-        username: true,
-        name: true,
-        password: true,
-        role: true,
-        isVerified: true,
-      }
-    });
+    let user = null;
+    
+    if (connectionMethod === 'prisma') {
+      user = await prisma.user.findUnique({
+        where: { email },
+        select: {
+          id: true,
+          email: true,
+          username: true,
+          name: true,
+          password: true,
+          role: true,
+          isVerified: true,
+        }
+      });
+    } else if (connectionMethod === 'supabase') {
+      user = await getUserByEmail(email);
+    }
 
     if (!user) {
       console.log('User not found for email:', email);
