@@ -133,6 +133,12 @@ export default function HomePage() {
                     안녕하세요, {user?.name || user?.username || '사용자'}님!
                   </span>
                   <Link
+                    href="/dashboard"
+                    className="px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors font-medium"
+                  >
+                    내 프롬프트
+                  </Link>
+                  <Link
                     href="/write"
                     className="px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors font-medium"
                   >
