@@ -17,9 +17,16 @@ export async function POST(request: NextRequest) {
     // 데이터베이스 연결 상태 확인
     const isConnected = await checkDatabaseConnection();
     if (!isConnected) {
-      console.error('❌ Database connection failed, returning error');
+      console.error('❌ Database connection failed, returning detailed error');
       return NextResponse.json(
-        { error: '데이터베이스 연결에 실패했습니다. 잠시 후 다시 시도해주세요.' },
+        { 
+          error: '데이터베이스 연결에 실패했습니다. 잠시 후 다시 시도해주세요.',
+          details: '환경 변수가 설정되지 않았거나 데이터베이스 연결에 문제가 있습니다.',
+          environment: process.env.NODE_ENV,
+          hasDatabaseUrl: !!process.env.DATABASE_URL,
+          hasNetlifyDatabaseUrl: !!process.env.NETLIFY_DATABASE_URL,
+          hasSupabaseDatabaseUrl: !!process.env.SUPABASE_DATABASE_URL
+        },
         { status: 503 }
       );
     }
