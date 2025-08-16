@@ -75,8 +75,19 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     console.error('Pending prompts error:', error);
+    
+    // 더 구체적인 오류 메시지 제공
+    let errorMessage = '승인 대기 프롬프트를 불러오는데 실패했습니다.';
+    if (error instanceof Error) {
+      if (error.message.includes('prisma') || error.message.includes('database')) {
+        errorMessage = '데이터베이스 연결 오류가 발생했습니다.';
+      } else if (error.message.includes('timeout')) {
+        errorMessage = '요청 시간이 초과되었습니다.';
+      }
+    }
+    
     return NextResponse.json(
-      { error: '승인 대기 프롬프트를 불러오는데 실패했습니다.' },
+      { error: errorMessage },
       { status: 500 }
     );
   }
