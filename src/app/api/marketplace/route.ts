@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
 
     console.log('🔍 Fetching marketplace prompts with params:', { page, limit, category, search, sortBy, sortOrder });
 
-    // 기본 쿼리 - 마켓플레이스 프롬프트만 (유료, 승인된 것)
+    // 기본 쿼리 - 마켓플레이스 프롬프트만 (유료, 승인된 것, 공개된 것)
     let query = supabase
       .from('prompts')
       .select(`
@@ -45,7 +45,8 @@ export async function GET(request: NextRequest) {
       .eq('type', 'MARKETPLACE')  // 마켓플레이스 프롬프트만
       .gt('price', 0)             // 유료만
       .eq('status', 'APPROVED')   // 승인된 것만
-      .eq('is_public', true);     // 공개된 것만
+      .eq('is_public', true)      // 공개된 것만
+      .neq('status', 'DRAFT');    // 비공개(DRAFT) 제외
 
     // 검색 필터
     if (search) {

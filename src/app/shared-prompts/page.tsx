@@ -96,8 +96,13 @@ export default function SharedPromptsPage() {
     }
   };
 
-  // 현재는 카테고리 정보가 없으므로 모든 프롬프트 표시
-  const filteredPrompts = prompts;
+  // 공개된 승인된 프롬프트만 필터링
+  const filteredPrompts = prompts.filter(prompt => 
+    prompt.is_public === true && 
+    prompt.status === 'APPROVED' &&
+    prompt.type === 'SHARED' &&
+    prompt.price === 0
+  );
 
   const formatPrice = (price: number) => {
     return price === 0 ? "무료" : `₩${price.toLocaleString()}`;

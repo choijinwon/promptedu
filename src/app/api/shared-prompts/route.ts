@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
 
     console.log('🔍 Fetching shared prompts with params:', { page, limit, category, search, sortBy, sortOrder });
 
-    // 기본 쿼리 - 공유 프롬프트만 (무료, 승인된 것)
+    // 기본 쿼리 - 공유 프롬프트만 (무료, 승인된 것, 공개된 것)
     let query = supabase
       .from('prompts')
       .select(`
@@ -42,10 +42,11 @@ export async function GET(request: NextRequest) {
         rating_count,
         created_at
       `)
-      .eq('type', 'SHARED')  // 공유 프롬프트만
-      .eq('price', 0)        // 무료만
+      .eq('type', 'SHARED')      // 공유 프롬프트만
+      .eq('price', 0)            // 무료만
       .eq('status', 'APPROVED')  // 승인된 것만
-      .eq('is_public', true);    // 공개된 것만
+      .eq('is_public', true)     // 공개된 것만
+      .neq('status', 'DRAFT');   // 비공개(DRAFT) 제외
 
     // 카테고리 필터 (임시 비활성화)
     // if (category && category !== 'all') {

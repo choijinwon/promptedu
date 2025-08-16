@@ -29,6 +29,8 @@ interface Prompt {
   tags: string[];
   createdAt: string;
   image?: string;
+  is_public?: boolean;
+  status?: string;
 }
 
 const categories = [
@@ -119,7 +121,9 @@ export default function Marketplace() {
           },
           tags: (prompt.tags as string[]) || [],
           createdAt: prompt.created_at as string,
-          image: undefined
+          image: undefined,
+          is_public: prompt.is_public as boolean,
+          status: prompt.status as string
         }));
         
         console.log('📋 마켓플레이스 프롬프트:', formattedPrompts);
@@ -237,6 +241,11 @@ export default function Marketplace() {
 
   const filteredPrompts = useMemo(() => {
     return prompts.filter((prompt: Prompt) => {
+      // 공개된 승인된 프롬프트만 필터링
+      if (!prompt.is_public || prompt.status !== 'APPROVED') {
+        return false;
+      }
+      
       const matchesSearch = prompt.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            prompt.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            (prompt.tags || []).some((tag: string) => tag.toLowerCase().includes(searchTerm.toLowerCase()));
