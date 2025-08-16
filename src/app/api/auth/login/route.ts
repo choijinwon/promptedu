@@ -15,76 +15,39 @@ export async function POST(request: NextRequest) {
       NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL ? 'SET' : 'NOT_SET',
     });
 
-    // 데이터베이스 연결 상태 확인 (Supabase만 시도)
+    // 데이터베이스 연결 상태 확인 (Prisma 사용)
     console.log('🔍 Checking database connections...');
     
     let isConnected = false;
-    let connectionMethod = 'none';
     let connectionError = null;
     
-    // Supabase 연결만 시도 (Netlify에서 더 안정적)
+    // Prisma 연결 시도
     try {
-      console.log('🔍 Attempting Supabase connection...');
-      isConnected = await checkSupabaseConnection();
+      console.log('🔍 Attempting Prisma connection...');
+      isConnected = await checkDatabaseConnection();
       if (isConnected) {
-        connectionMethod = 'supabase';
-        console.log('✅ Using Supabase connection');
+        console.log('✅ Using Prisma connection');
       }
     } catch (error) {
-      console.error('❌ Supabase connection failed:', error);
-      console.error('❌ Supabase error details:', {
-        name: error instanceof Error ? error.name : 'Unknown',
-        message: error instanceof Error ? error.message : String(error),
-        stack: error instanceof Error ? error.stack : 'No stack trace'
-      });
+      console.error('❌ Prisma connection failed:', error);
       connectionError = error;
     }
     
-    // 연결 실패 시 임시 로그인 허용 (개발/테스트용)
+    // 연결 실패 시 로그인 거부
     if (!isConnected) {
-      console.warn('⚠️ Database connection failed, but allowing temporary login for testing');
+      console.warn('⚠️ Database connection failed');
       console.error('❌ Connection error details:', connectionError);
       
-      // 임시 로그인 허용 (테스트 계정만)
-      const { email, password } = await request.json();
-      
-      if (email === 'a@test.com' && password === 'password123') {
-        console.log('✅ Temporary login successful for test account');
-        
-        // 실제 JWT 토큰 생성
-        const token = generateToken({
-          userId: 'temp-user-id',
-          email: 'a@test.com',
-          role: 'USER'
-        });
-        
-        return NextResponse.json({
-          message: '로그인이 완료되었습니다. (데이터베이스 연결 없음)',
-          user: {
-            id: 'temp-user-id',
-            email: 'a@test.com',
-            username: 'testuser',
-            name: '테스트 사용자',
-            role: 'USER',
-            isVerified: true,
-          },
-          token: token,
-          isTemporary: false,
-          databaseStatus: 'disconnected'
-        });
-      } else {
-        return NextResponse.json(
-          { 
-            error: '데이터베이스 연결에 실패했습니다. 잠시 후 다시 시도해주세요.',
-            details: 'Supabase 연결에 문제가 있습니다. (테스트 계정: a@test.com / password123)',
-            environment: process.env.NODE_ENV,
-            hasSupabaseUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
-            hasSupabaseKey: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-            connectionError: connectionError ? String(connectionError) : 'Unknown error'
-          },
-          { status: 503 }
-        );
-      }
+      return NextResponse.json(
+        { 
+          error: '데이터베이스 연결에 실패했습니다. 잠시 후 다시 시도해주세요.',
+          details: 'Prisma 연결에 문제가 있습니다. 관리자에게 문의해주세요.',
+          environment: process.env.NODE_ENV,
+          hasDatabaseUrl: !!process.env.DATABASE_URL,
+          connectionError: connectionError ? String(connectionError) : 'Unknown error'
+        },
+        { status: 503 }
+      );
     }
 
     const { email, password } = await request.json();
@@ -100,26 +63,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Find user using Supabase
+    // Find user using Prisma
     console.log('Looking for user with email:', email);
-    let user = null;
-    
-    if (connectionMethod === 'supabase') {
-      // Supabase를 사용한 사용자 조회
-      const { data, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('email', email)
-        .single();
-      
-      if (error) {
-        console.error('❌ Supabase user fetch error:', error);
-        user = null;
-      } else {
-        user = data;
-        console.log('✅ User found via Supabase:', { id: user.id, email: user.email });
+    const user = await prisma.user.findUnique({
+      where: { email },
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        name: true,
+        password: true,
+        role: true,
+        isVerified: true,
       }
-    }
+    });
 
     if (!user) {
       console.log('User not found for email:', email);

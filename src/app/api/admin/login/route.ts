@@ -17,31 +17,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 임시 관리자 로그인 (데이터베이스 연결 문제 해결 전까지)
-    if (username === 'admin' && password === 'admin123') {
-      console.log('✅ Temporary admin login successful');
-      
-      // 실제 JWT 토큰 생성
-      const token = generateToken({
-        userId: 'temp-admin-id',
-        email: 'admin@test.com',
-        role: 'ADMIN'
-      });
-      
-      return NextResponse.json({
-        message: '관리자 로그인이 완료되었습니다.',
-        user: {
-          id: 'temp-admin-id',
-          email: 'admin@test.com',
-          username: 'admin',
-          name: '관리자',
-          role: 'ADMIN',
-          isVerified: true,
-        },
-        token: token,
-        isTemporary: false
-      });
-    }
+    // 임시 관리자 로그인 제거 - 실제 데이터베이스에서 관리자 조회 필요
+    console.log('❌ No temporary admin login available. Database connection required.');
+    return NextResponse.json(
+      { error: '관리자 로그인을 위해서는 데이터베이스 연결이 필요합니다.' },
+      { status: 503 }
+    );
 
     // Find user by username
     console.log('Looking for user with username:', username);
