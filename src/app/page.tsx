@@ -1,9 +1,52 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function HomePage() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  // 로그인 상태 확인
+  useEffect(() => {
+    const checkAuth = async () => {
+      const token = localStorage.getItem("prompt_hub_token");
+      if (token) {
+        try {
+          const response = await fetch("/api/auth/me", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          if (response.ok) {
+            const userData = await response.json();
+            setUser(userData.user);
+            setIsLoggedIn(true);
+          } else {
+            localStorage.removeItem("prompt_hub_token");
+            setIsLoggedIn(false);
+            setUser(null);
+          }
+        } catch (error) {
+          console.error("Auth check error:", error);
+          localStorage.removeItem("prompt_hub_token");
+          setIsLoggedIn(false);
+          setUser(null);
+        }
+      }
+      setLoading(false);
+    };
+    checkAuth();
+  }, []);
+
+  // 로그아웃 함수
+  const handleLogout = () => {
+    localStorage.removeItem("prompt_hub_token");
+    setIsLoggedIn(false);
+    setUser(null);
+    window.location.href = "/";
+  };
   useEffect(() => {
     // 구조화된 데이터 추가
     const structuredData = {
@@ -73,18 +116,42 @@ export default function HomePage() {
             </nav>
 
             <div className="flex items-center space-x-4">
-              <Link
-                href="/login"
-                className="px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors font-medium"
-              >
-                로그인
-              </Link>
-              <Link
-                href="/register"
-                className="px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
-              >
-                회원가입
-              </Link>
+              {loading ? (
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+              ) : isLoggedIn ? (
+                <>
+                  <span className="text-gray-700 font-medium">
+                    안녕하세요, {user?.name || user?.username || '사용자'}님!
+                  </span>
+                  <Link
+                    href="/write"
+                    className="px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors font-medium"
+                  >
+                    글쓰기
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors font-medium"
+                  >
+                    로그아웃
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    className="px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors font-medium"
+                  >
+                    로그인
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
+                  >
+                    회원가입
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>
