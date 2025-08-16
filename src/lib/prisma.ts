@@ -27,4 +27,16 @@ export const prisma = globalForPrisma.prisma ?? new PrismaClient({
   },
 })
 
+// 연결 상태 확인 함수
+export const checkDatabaseConnection = async () => {
+  try {
+    await prisma.$connect();
+    console.log('✅ Database connection check successful');
+    return true;
+  } catch (error) {
+    console.error('❌ Database connection check failed:', error);
+    return false;
+  }
+}
+
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma 

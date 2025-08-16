@@ -1,19 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { prisma, checkDatabaseConnection } from '@/lib/prisma';
 import { comparePassword, generateToken } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
-    // 데이터베이스 연결 확인 (선택적)
-    let dbConnected = false;
-    try {
-      await prisma.$connect();
-      console.log('✅ Database connection successful');
-      dbConnected = true;
-    } catch (dbError) {
-      console.error('❌ Database connection failed:', dbError);
-      // 연결 실패해도 계속 진행 (기존 연결 사용)
-      console.log('⚠️ Continuing with existing connection...');
+    // 데이터베이스 연결 확인
+    console.log('🔍 Environment check:', {
+      NODE_ENV: process.env.NODE_ENV,
+      DATABASE_URL: process.env.DATABASE_URL ? 'SET' : 'NOT_SET',
+      NETLIFY_DATABASE_URL: process.env.NETLIFY_DATABASE_URL ? 'SET' : 'NOT_SET',
+      NETLIFY_DATABASE_URL_UNPOOLED: process.env.NETLIFY_DATABASE_URL_UNPOOLED ? 'SET' : 'NOT_SET',
+    });
+
+    // 데이터베이스 연결 상태 확인
+    const isConnected = await checkDatabaseConnection();
+    if (!isConnected) {
+      console.error('❌ Database connection failed, returning error');
+      return NextResponse.json(
+        { error: '데이터베이스 연결에 실패했습니다. 잠시 후 다시 시도해주세요.' },
+        { status: 503 }
+      );
     }
 
     const { email, password } = await request.json();
