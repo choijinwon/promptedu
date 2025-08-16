@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 import { verifyToken, extractTokenFromHeader } from '@/lib/auth';
+
+// 동적으로 Prisma 클라이언트 import
+const getPrisma = async () => {
+  const { prisma } = await import('@/lib/prisma');
+  return prisma;
+};
 
 export async function GET(request: NextRequest) {
   try {
@@ -25,6 +30,7 @@ export async function GET(request: NextRequest) {
 
 
     // 실제 데이터베이스에서 사용자 조회
+    const prisma = await getPrisma();
     const user = await prisma.user.findUnique({
       where: { id: payload.userId },
       select: {

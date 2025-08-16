@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 import { comparePassword, generateToken } from '@/lib/auth';
+
+// 동적으로 Prisma 클라이언트 import
+const getPrisma = async () => {
+  const { prisma } = await import('@/lib/prisma');
+  return prisma;
+};
 
 export async function POST(request: NextRequest) {
   try {
@@ -21,6 +26,7 @@ export async function POST(request: NextRequest) {
 
     // Find user by username
     console.log('Looking for user with username:', username);
+    const prisma = await getPrisma();
     const user = await prisma.user.findUnique({
       where: { username },
       select: {

@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma, checkDatabaseConnection } from '@/lib/prisma';
-import { checkSupabaseConnection, supabase } from '@/lib/supabase-db';
 import { comparePassword, generateToken } from '@/lib/auth';
+
+// 동적으로 Prisma 클라이언트 import
+const getPrisma = async () => {
+  const { prisma, checkDatabaseConnection } = await import('@/lib/prisma');
+  return { prisma, checkDatabaseConnection };
+};
 
 export async function POST(request: NextRequest) {
   try {
@@ -24,6 +28,7 @@ export async function POST(request: NextRequest) {
     // Prisma 연결 시도
     try {
       console.log('🔍 Attempting Prisma connection...');
+      const { checkDatabaseConnection } = await getPrisma();
       isConnected = await checkDatabaseConnection();
       if (isConnected) {
         console.log('✅ Using Prisma connection');
@@ -65,6 +70,7 @@ export async function POST(request: NextRequest) {
 
     // Find user using Prisma
     console.log('Looking for user with email:', email);
+    const { prisma } = await getPrisma();
     const user = await prisma.user.findUnique({
       where: { email },
       select: {

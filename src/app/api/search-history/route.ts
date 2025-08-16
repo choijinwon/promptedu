@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 import { verifyToken, extractTokenFromHeader } from '@/lib/auth';
+
+// 동적으로 Prisma 클라이언트 import
+const getPrisma = async () => {
+  const { prisma } = await import('@/lib/prisma');
+  return prisma;
+};
 
 export async function POST(request: NextRequest) {
   try {
@@ -30,6 +35,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 검색 히스토리 저장
+    const prisma = await getPrisma();
     await prisma.searchHistory.create({
       data: {
         userId: payload.userId,
@@ -71,6 +77,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '10');
 
     // 최근 검색 히스토리 조회
+    const prisma = await getPrisma();
     const searchHistory = await prisma.searchHistory.findMany({
       where: {
         userId: payload.userId,
@@ -113,6 +120,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // 사용자의 모든 검색 히스토리 삭제
+    const prisma = await getPrisma();
     await prisma.searchHistory.deleteMany({
       where: {
         userId: payload.userId,
