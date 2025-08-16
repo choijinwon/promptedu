@@ -14,6 +14,8 @@ if (!databaseUrl) {
     NETLIFY_DATABASE_URL: !!process.env.NETLIFY_DATABASE_URL,
     NETLIFY_DATABASE_URL_UNPOOLED: !!process.env.NETLIFY_DATABASE_URL_UNPOOLED,
   });
+} else {
+  console.log('✅ Database URL is configured');
 }
 
 export const prisma = globalForPrisma.prisma ?? new PrismaClient({

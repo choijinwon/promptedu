@@ -4,16 +4,16 @@ import { comparePassword, generateToken } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
-    // 데이터베이스 연결 확인
+    // 데이터베이스 연결 확인 (선택적)
+    let dbConnected = false;
     try {
       await prisma.$connect();
       console.log('✅ Database connection successful');
+      dbConnected = true;
     } catch (dbError) {
       console.error('❌ Database connection failed:', dbError);
-      return NextResponse.json(
-        { error: '데이터베이스 연결에 실패했습니다. 잠시 후 다시 시도해주세요.' },
-        { status: 503 }
-      );
+      // 연결 실패해도 계속 진행 (기존 연결 사용)
+      console.log('⚠️ Continuing with existing connection...');
     }
 
     const { email, password } = await request.json();
