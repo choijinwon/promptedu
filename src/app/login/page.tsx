@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { apiPost } from "@/lib/api";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -18,11 +19,7 @@ export default function LoginPage() {
     console.log('Attempting login with:', { email, password: password ? '[HIDDEN]' : 'MISSING' });
     
     try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+      const res = await apiPost("/api/auth/login", { email, password });
       
       console.log('Login response status:', res.status);
       console.log('Login response headers:', Object.fromEntries(res.headers.entries()));

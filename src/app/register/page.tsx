@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { apiPost } from "@/lib/api";
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -42,15 +43,11 @@ export default function RegisterPage() {
     }
 
     try {
-      const res = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: formData.email,
-          username: formData.username,
-          password: formData.password,
-          name: formData.name,
-        }),
+      const res = await apiPost("/api/auth/register", {
+        email: formData.email,
+        username: formData.username,
+        password: formData.password,
+        name: formData.name,
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "회원가입 실패");

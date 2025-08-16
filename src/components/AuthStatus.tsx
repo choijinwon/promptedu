@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { apiGet, apiPost } from "@/lib/api";
 
 interface User {
   id: string;
@@ -19,7 +20,7 @@ export default function AuthStatus() {
   useEffect(() => {
     const token = localStorage.getItem("prompt_hub_token");
     if (token) {
-      fetch("/api/auth/me", {
+      apiGet("/api/auth/me", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -45,7 +46,7 @@ export default function AuthStatus() {
 
   const handleLogout = async () => {
     try {
-      await fetch("/api/auth/logout", { method: "POST" });
+      await apiPost("/api/auth/logout", {});
     } catch (error) {
       console.error("Logout error:", error);
     } finally {

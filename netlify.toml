@@ -7,11 +7,7 @@
   directory = ".next/server/app/api"
   node_bundler = "nft"
 
-# API 라우트 리다이렉트
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/:splat"
-  status = 200
+
 
 # 개발 환경에서 API 라우트 테스트를 위한 설정
 [dev]
