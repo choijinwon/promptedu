@@ -22,6 +22,39 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // 임시 사용자 토큰 처리
+    if (payload.userId === 'temp-user-id') {
+      return NextResponse.json({
+        user: {
+          id: 'temp-user-id',
+          email: 'a@test.com',
+          username: 'testuser',
+          name: '테스트 사용자',
+          role: 'USER',
+          isVerified: true,
+          createdAt: new Date().toISOString(),
+        },
+        isTemporary: true
+      });
+    }
+
+    // 임시 관리자 토큰 처리
+    if (payload.userId === 'temp-admin-id') {
+      return NextResponse.json({
+        user: {
+          id: 'temp-admin-id',
+          email: 'admin@test.com',
+          username: 'admin',
+          name: '관리자',
+          role: 'ADMIN',
+          isVerified: true,
+          createdAt: new Date().toISOString(),
+        },
+        isTemporary: true
+      });
+    }
+
+    // 실제 데이터베이스에서 사용자 조회
     const user = await prisma.user.findUnique({
       where: { id: payload.userId },
       select: {

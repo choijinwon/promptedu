@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { apiGet } from "@/lib/api";
 
 export default function HomePage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -16,7 +17,7 @@ export default function HomePage() {
       
       if (token) {
         try {
-          const response = await fetch("/api/auth/me", {
+          const response = await apiGet("/api/auth/me", {
             headers: {
               Authorization: `Bearer ${token}`,
             },
