@@ -14,6 +14,8 @@ export default function RegisterPage() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState("");
   const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -52,16 +54,79 @@ export default function RegisterPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "회원가입 실패");
       
-      // JWT 저장
-      localStorage.setItem("prompt_hub_token", data.token);
-      // 성공시 메인 페이지로 이동
-      router.push("/");
+      // 회원가입 성공
+      setSuccess(true);
+      setRegisteredEmail(formData.email);
+      
+      // 개발 환경에서만 토큰 저장 (실제로는 이메일 인증 후에 저장)
+      if (process.env.NODE_ENV === 'development' && data.debug?.verificationLink) {
+        console.log('🔗 Development verification link:', data.debug.verificationLink);
+      }
+      
     } catch (err: any) {
       setError(err.message || "회원가입 중 오류 발생");
     } finally {
       setLoading(false);
     }
   };
+
+  if (success) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 via-white to-blue-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+        <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg w-full max-w-md space-y-6 border border-gray-200 dark:border-gray-700">
+          <div className="text-center">
+            <div className="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">회원가입 완료!</h1>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
+              <strong>{registeredEmail}</strong>로 인증 이메일을 발송했습니다.
+            </p>
+            
+            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg mb-6">
+              <h3 className="font-semibold text-blue-800 dark:text-blue-200 mb-2">다음 단계:</h3>
+              <ol className="text-sm text-blue-700 dark:text-blue-300 space-y-1 text-left">
+                <li>1. 이메일함을 확인해주세요</li>
+                <li>2. &quot;이메일 인증하기&quot; 버튼을 클릭하세요</li>
+                <li>3. 인증 완료 후 로그인하실 수 있습니다</li>
+              </ol>
+            </div>
+
+            <div className="space-y-3">
+              <button
+                onClick={() => router.push('/login')}
+                className="w-full bg-blue-600 dark:bg-blue-500 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors duration-200"
+              >
+                로그인으로 이동
+              </button>
+              <button
+                onClick={() => {
+                  setSuccess(false);
+                  setFormData({
+                    email: "",
+                    username: "",
+                    password: "",
+                    confirmPassword: "",
+                    name: "",
+                  });
+                }}
+                className="w-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white py-2 rounded-lg font-semibold hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200"
+              >
+                다른 계정으로 가입
+              </button>
+            </div>
+
+            <div className="mt-6 text-sm text-gray-500 dark:text-gray-400">
+              <p>이메일이 오지 않았나요?</p>
+              <p>스팸함을 확인하거나 잠시 후 다시 시도해주세요.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 via-white to-blue-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
@@ -97,6 +162,9 @@ export default function RegisterPage() {
             required
             placeholder="사용자명을 입력하세요"
           />
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            영문, 숫자, 언더스코어(_)만 사용 가능
+          </p>
         </div>
 
         <div>
@@ -123,6 +191,9 @@ export default function RegisterPage() {
             required
             placeholder="비밀번호를 입력하세요"
           />
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            최소 6자 이상
+          </p>
         </div>
 
         <div>

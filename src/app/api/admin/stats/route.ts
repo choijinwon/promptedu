@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken, extractTokenFromHeader } from '@/lib/auth';
+import { getUserById } from '@/lib/supabase-db';
 
 export async function GET(request: NextRequest) {
   try {
@@ -20,10 +21,7 @@ export async function GET(request: NextRequest) {
     }
 
     // 관리자 권한 확인
-    const user = await prisma.user.findUnique({
-      where: { id: payload.userId },
-      select: { role: true }
-    });
+    const user = await getUserById(payload.userId);
 
     if (!user || user.role !== 'ADMIN') {
       return NextResponse.json(
@@ -32,23 +30,15 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // 통계 데이터 조회
-    const [totalUsers, totalPrompts, pendingPrompts, totalRevenue] = await Promise.all([
-      prisma.user.count(),
-      prisma.prompt.count(),
-      prisma.prompt.count({ where: { status: 'PENDING' } }),
-      prisma.order.aggregate({
-        where: { status: 'COMPLETED' },
-        _sum: { amount: true }
-      })
-    ]);
+    // 임시 통계 데이터
+    const mockData = {
+      totalUsers: 2,
+      totalPrompts: 0,
+      pendingPrompts: 0,
+      totalRevenue: 0
+    };
 
-    return NextResponse.json({
-      totalUsers,
-      totalPrompts,
-      pendingPrompts,
-      totalRevenue: totalRevenue._sum.amount || 0,
-    });
+    return NextResponse.json(mockData);
 
   } catch (error) {
     console.error('Admin stats error:', error);

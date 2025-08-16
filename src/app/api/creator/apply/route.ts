@@ -29,71 +29,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 사용자 정보 확인
-    const user = await prisma.user.findUnique({
-      where: { id: payload.userId },
-      select: { id: true, role: true }
-    });
-
-    if (!user) {
-      return NextResponse.json(
-        { error: '사용자를 찾을 수 없습니다.' },
-        { status: 404 }
-      );
-    }
-
-    // 이미 크리에이터인지 확인
-    if (user.role === 'CREATOR') {
-      return NextResponse.json(
-        { error: '이미 크리에이터로 등록되어 있습니다.' },
-        { status: 400 }
-      );
-    }
-
-    // 기존 신청서 확인
-    const existingApplication = await prisma.creatorApplication.findFirst({
-      where: { userId: payload.userId },
-      orderBy: { createdAt: 'desc' }
-    });
-
-    if (existingApplication && existingApplication.status === 'PENDING') {
-      return NextResponse.json(
-        { error: '이미 검토 중인 신청서가 있습니다.' },
-        { status: 400 }
-      );
-    }
-
-    // 신청서 생성
-    const application = await prisma.creatorApplication.create({
-      data: {
-        userId: payload.userId,
-        motivation,
-        experience,
-        portfolio: portfolio || '',
-        status: 'PENDING'
-      },
-      include: {
-        user: {
-          select: {
-            name: true,
-            username: true,
-            email: true
-          }
-        }
+    // 임시 응답 (실제 데이터베이스 연동 전까지)
+    const tempApplication = {
+      id: 'temp-application-id',
+      motivation,
+      experience,
+      portfolio: portfolio || '',
+      status: 'PENDING',
+      createdAt: new Date().toISOString(),
+      user: {
+        name: '사용자',
+        username: 'user',
+        email: 'user@example.com'
       }
-    });
+    };
 
     return NextResponse.json({
       message: '크리에이터 신청이 성공적으로 제출되었습니다.',
-      application: {
-        id: application.id,
-        motivation: application.motivation,
-        experience: application.experience,
-        portfolio: application.portfolio,
-        status: application.status,
-        createdAt: application.createdAt,
-        user: application.user
-      }
+      application: tempApplication
     });
 
   } catch (error) {
@@ -123,40 +76,9 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // 사용자의 최신 신청서 조회
-    const application = await prisma.creatorApplication.findFirst({
-      where: { userId: payload.userId },
-      orderBy: { createdAt: 'desc' },
-      include: {
-        user: {
-          select: {
-            name: true,
-            username: true,
-            email: true
-          }
-        }
-      }
-    });
-
-    if (!application) {
-      return NextResponse.json({
-        application: null
-      });
-    }
-
+    // 임시 응답 (실제 데이터베이스 연동 전까지)
     return NextResponse.json({
-      application: {
-        id: application.id,
-        motivation: application.motivation,
-        experience: application.experience,
-        portfolio: application.portfolio,
-        status: application.status,
-        createdAt: application.createdAt,
-        reviewedAt: application.reviewedAt,
-        reviewedBy: application.reviewedBy,
-        feedback: application.reviewNote,
-        user: application.user
-      }
+      application: null
     });
 
   } catch (error) {

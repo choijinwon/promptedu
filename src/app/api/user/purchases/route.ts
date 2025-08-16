@@ -19,60 +19,65 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // 사용자가 구매한 프롬프트 조회
-    const purchases = await prisma.order.findMany({
-      where: {
-        userId: payload.userId,
+    // 임시 구매 내역 데이터 (실제 주문 테이블 연동 전까지)
+    const mockPurchases = [
+      {
+        id: '1',
+        promptId: '1',
+        amount: 1000,
         status: 'COMPLETED',
-      },
-      include: {
+        createdAt: new Date().toISOString(),
         prompt: {
-          include: {
-            author: {
-              select: {
-                name: true,
-                username: true,
-              }
-            },
-            category: true,
-          }
+          id: '1',
+          title: '샘플 프롬프트 1',
+          description: '샘플 프롬프트 설명입니다.',
+          content: '샘플 프롬프트 내용입니다.',
+          price: 1000,
+          category: {
+            name: '일반',
+            icon: '📝',
+            color: '#3B82F6',
+          },
+          author: {
+            name: '샘플 작성자 1',
+          },
+          tags: ['샘플', '테스트'],
+          downloads: 10,
+          rating: 4.5,
+          createdAt: new Date().toISOString(),
         }
       },
-      orderBy: {
-        createdAt: 'desc',
+      {
+        id: '2',
+        promptId: '2',
+        amount: 2000,
+        status: 'COMPLETED',
+        createdAt: new Date().toISOString(),
+        prompt: {
+          id: '2',
+          title: '샘플 프롬프트 2',
+          description: '샘플 프롬프트 설명입니다.',
+          content: '샘플 프롬프트 내용입니다.',
+          price: 2000,
+          category: {
+            name: '마케팅',
+            icon: '📈',
+            color: '#10B981',
+          },
+          author: {
+            name: '샘플 작성자 2',
+          },
+          tags: ['마케팅', '광고'],
+          downloads: 25,
+          rating: 4.8,
+          createdAt: new Date().toISOString(),
+        }
       }
-    });
-
-    const transformedPurchases = purchases.map(purchase => ({
-      id: purchase.id,
-      promptId: purchase.promptId,
-      amount: purchase.amount,
-      status: purchase.status,
-      createdAt: purchase.createdAt,
-      prompt: {
-        id: purchase.prompt.id,
-        title: purchase.prompt.title,
-        description: purchase.prompt.description,
-        content: purchase.prompt.content,
-        price: purchase.prompt.price,
-        category: {
-          name: purchase.prompt.category.name,
-          icon: purchase.prompt.category.icon,
-          color: purchase.prompt.category.color,
-        },
-        author: {
-          name: purchase.prompt.author.name || purchase.prompt.author.username,
-        },
-        tags: JSON.parse(purchase.prompt.tags || '[]'),
-        downloads: purchase.prompt.downloads,
-        rating: purchase.prompt.rating,
-        createdAt: purchase.prompt.createdAt,
-      }
-    }));
+    ];
 
     return NextResponse.json({
-      purchases: transformedPurchases,
-      total: transformedPurchases.length,
+      purchases: mockPurchases,
+      total: mockPurchases.length,
     });
 
   } catch (error) {

@@ -2,13 +2,12 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
-import { MagnifyingGlassIcon, FunnelIcon, StarIcon, ArrowDownTrayIcon, EyeIcon, FireIcon, SparklesIcon, HeartIcon, ClockIcon } from "@heroicons/react/24/outline";
+import { MagnifyingGlassIcon, StarIcon, ArrowDownTrayIcon, EyeIcon, HeartIcon, ClockIcon } from "@heroicons/react/24/outline";
 import { StarIcon as StarIconSolid, HeartIcon as HeartIconSolid } from "@heroicons/react/24/solid";
 import Link from "next/link";
 import PromptPreview from "./PromptPreview";
 import Toast from "./Toast";
-import CommentSection from "./CommentSection";
-import FollowButton from "./FollowButton";
+
 
 interface Prompt {
   id: string;
@@ -52,10 +51,20 @@ export default function Marketplace() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [purchasing, setPurchasing] = useState<string | null>(null);
+
   const [activeTab, setActiveTab] = useState<"all" | "purchases" | "favorites">("all");
-  const [purchases, setPurchases] = useState<any[]>([]);
-  const [favorites, setFavorites] = useState<any[]>([]);
+  const [purchases, setPurchases] = useState<Array<{
+    id: string;
+    promptId: string;
+    prompt: Prompt;
+    purchasedAt: string;
+  }>>([]);
+  const [favorites, setFavorites] = useState<Array<{
+    id: string;
+    promptId: string;
+    prompt: Prompt;
+    createdAt: string;
+  }>>([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
   const [showSearchHistory, setShowSearchHistory] = useState(false);
@@ -71,7 +80,7 @@ export default function Marketplace() {
     isVisible: false,
   });
   const [favoriteAnimations, setFavoriteAnimations] = useState<{ [key: string]: boolean }>({});
-  const [previewActiveTab, setPreviewActiveTab] = useState<'preview' | 'comments'>('preview');
+
 
   // 로그인 상태 확인
   useEffect(() => {
@@ -79,17 +88,42 @@ export default function Marketplace() {
     setIsLoggedIn(!!token);
   }, []);
 
-  // API에서 승인된 프롬프트 가져오기
+  // API에서 승인된 유료 프롬프트 가져오기
   useEffect(() => {
     const fetchPrompts = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/api/prompts?status=ACTIVE');
+        const response = await fetch('/api/marketplace');
         if (!response.ok) {
-          throw new Error('프롬프트를 불러오는데 실패했습니다');
+          throw new Error('마켓플레이스 프롬프트를 불러오는데 실패했습니다');
         }
         const data = await response.json();
-        setPrompts(data.prompts || []);
+        
+        // API 데이터를 컴포넌트 형식에 맞게 변환
+        const formattedPrompts = (data.prompts || []).map((prompt: Record<string, unknown>) => ({
+          id: prompt.id as string,
+          title: prompt.title as string,
+          description: prompt.description as string,
+          content: prompt.content as string,
+          author: {
+            name: '테스트 사용자' // 기본값
+          },
+          price: prompt.price as number,
+          rating: (prompt.rating as number) || 0,
+          downloads: (prompt.downloads as number) || 0,
+          views: (prompt.views as number) || 0,
+          category: {
+            name: '일반', // 기본값
+            icon: '🏷️',
+            color: '#6B7280'
+          },
+          tags: (prompt.tags as string[]) || [],
+          createdAt: prompt.created_at as string,
+          image: undefined
+        }));
+        
+        console.log('📋 마켓플레이스 프롬프트:', formattedPrompts);
+        setPrompts(formattedPrompts);
       } catch (err) {
         setError(err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다');
       } finally {
@@ -205,8 +239,9 @@ export default function Marketplace() {
     return prompts.filter((prompt: Prompt) => {
       const matchesSearch = prompt.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            prompt.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           prompt.tags.some((tag: string) => tag.toLowerCase().includes(searchTerm.toLowerCase()));
-      const matchesCategory = selectedCategory === "전체" || prompt.category.name === selectedCategory;
+                           (prompt.tags || []).some((tag: string) => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+      // 현재는 카테고리 정보가 없으므로 카테고리 필터 비활성화
+      const matchesCategory = true; // selectedCategory === "전체" || prompt.category.name === selectedCategory;
       const matchesPrice = priceFilter === "전체" || 
                           (priceFilter === "무료" && prompt.price === 0) ||
                           (priceFilter === "유료" && prompt.price > 0);
@@ -243,44 +278,7 @@ export default function Marketplace() {
     return new Date(dateString).toLocaleDateString('ko-KR');
   };
 
-  const handlePurchase = async (promptId: string) => {
-    const token = localStorage.getItem("prompt_hub_token");
-    if (!token) {
-      alert("로그인이 필요합니다.");
-      return;
-    }
 
-    setPurchasing(promptId);
-    try {
-      const response = await fetch(`/api/prompts/${promptId}/purchase`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || '구매 처리 중 오류가 발생했습니다.');
-      }
-
-      // 구매 성공 시 프롬프트 목록 새로고침
-      const promptsResponse = await fetch('/api/prompts?status=ACTIVE');
-      if (promptsResponse.ok) {
-        const promptsData = await promptsResponse.json();
-        setPrompts(promptsData.prompts || []);
-      }
-
-      alert(data.message);
-    } catch (error) {
-      console.error('Purchase error:', error);
-      alert(error instanceof Error ? error.message : '구매 처리 중 오류가 발생했습니다.');
-    } finally {
-      setPurchasing(null);
-    }
-  };
 
   const handleToggleFavorite = async (promptId: string) => {
     const token = localStorage.getItem("prompt_hub_token");
@@ -639,7 +637,7 @@ export default function Marketplace() {
                     {/* Category Badge */}
                     <div className="flex items-center justify-between mb-4">
                       <span className="px-3 py-1 bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 text-sm font-medium rounded-full">
-                        {prompt.category.icon} {prompt.category.name}
+                        🏷️ 일반
                       </span>
                       <span className={`text-lg font-bold ${
                         prompt.price === 0 ? 'text-green-600' : 'text-blue-600'
@@ -658,7 +656,7 @@ export default function Marketplace() {
 
                     {/* Tags */}
                     <div className="flex flex-wrap gap-2 mb-4">
-                      {prompt.tags.slice(0, 3).map((tag, tagIndex) => (
+                      {(prompt.tags || []).slice(0, 3).map((tag, tagIndex) => (
                         <span
                           key={tagIndex}
                           className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-md hover:bg-gray-200 transition-colors"
@@ -666,9 +664,9 @@ export default function Marketplace() {
                           #{tag}
                         </span>
                       ))}
-                      {prompt.tags.length > 3 && (
+                      {(prompt.tags || []).length > 3 && (
                         <span className="text-xs text-gray-500 flex items-center">
-                          +{prompt.tags.length - 3}개 더
+                          +{(prompt.tags || []).length - 3}개 더
                         </span>
                       )}
                     </div>
@@ -693,7 +691,7 @@ export default function Marketplace() {
                       <div className="w-4 h-4 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
                         <span className="text-white text-xs">👤</span>
                       </div>
-                      <span className="truncate">{prompt.author.name}</span>
+                      <span className="truncate">테스트 사용자</span>
                     </div>
 
                     {/* Actions */}
@@ -701,19 +699,17 @@ export default function Marketplace() {
                       <div className="flex gap-2 flex-1">
                         {prompt.price > 0 ? (
                           <button 
-                            onClick={() => handlePurchase(prompt.id)}
-                            disabled={purchasing === prompt.id}
-                            className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 text-sm font-medium shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={true}
+                            className="flex-1 px-4 py-2 bg-gray-400 text-white rounded-xl transition-all duration-200 text-sm font-medium shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                           >
-                            {purchasing === prompt.id ? "처리 중..." : "💎 구매하기"}
+                            💎 구매 기능 준비 중
                           </button>
                         ) : (
                           <button 
-                            onClick={() => handlePurchase(prompt.id)}
-                            disabled={purchasing === prompt.id}
-                            className="flex-1 px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all duration-200 text-sm font-medium shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={true}
+                            className="flex-1 px-4 py-2 bg-gray-400 text-white rounded-xl transition-all duration-200 text-sm font-medium shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                           >
-                            {purchasing === prompt.id ? "다운로드 중..." : "🆓 무료 다운로드"}
+                            🆓 다운로드 기능 준비 중
                           </button>
                         )}
                         <button
@@ -763,7 +759,7 @@ export default function Marketplace() {
                         </h3>
                         <div className="flex items-center gap-3 flex-shrink-0">
                           <span className="px-3 py-1 bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 text-sm font-medium rounded-full whitespace-nowrap">
-                            {prompt.category.icon} {prompt.category.name}
+                            🏷️ 일반
                           </span>
                           <span className={`text-lg font-bold ${
                             prompt.price === 0 ? 'text-green-600' : 'text-blue-600'
@@ -776,7 +772,7 @@ export default function Marketplace() {
                       <p className="text-gray-600 mb-3 line-clamp-2 leading-relaxed break-words">{prompt.description}</p>
                       
                       <div className="flex flex-wrap gap-2 mb-3">
-                        {prompt.tags.map((tag, tagIndex) => (
+                        {(prompt.tags || []).map((tag, tagIndex) => (
                           <span
                             key={tagIndex}
                             className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-md hover:bg-gray-200 transition-colors whitespace-nowrap"
@@ -791,7 +787,7 @@ export default function Marketplace() {
                           <div className="w-4 h-4 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
                             <span className="text-white text-xs">👤</span>
                           </div>
-                          <span className="truncate">{prompt.author.name}</span>
+                          <span className="truncate">테스트 사용자</span>
                         </span>
                         <span className="whitespace-nowrap">📅 {formatDate(prompt.createdAt)}</span>
                         <div className="flex items-center gap-1">
@@ -813,19 +809,17 @@ export default function Marketplace() {
                     <div className="flex flex-col gap-2 lg:items-end flex-shrink-0">
                       {prompt.price > 0 ? (
                         <button 
-                          onClick={() => handlePurchase(prompt.id)}
-                          disabled={purchasing === prompt.id}
-                          className="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 font-medium shadow-lg hover:shadow-xl whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+                          disabled={true}
+                          className="px-8 py-3 bg-gray-400 text-white rounded-xl transition-all duration-200 font-medium shadow-lg whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          {purchasing === prompt.id ? "처리 중..." : "💎 구매하기"}
+                          💎 구매 기능 준비 중
                         </button>
                       ) : (
                         <button 
-                          onClick={() => handlePurchase(prompt.id)}
-                          disabled={purchasing === prompt.id}
-                          className="px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all duration-200 font-medium shadow-lg hover:shadow-xl whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+                          disabled={true}
+                          className="px-8 py-3 bg-gray-400 text-white rounded-xl transition-all duration-200 font-medium shadow-lg whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          {purchasing === prompt.id ? "다운로드 중..." : "🆓 무료 다운로드"}
+                          🆓 다운로드 기능 준비 중
                         </button>
                       )}
                       <Link
@@ -1006,7 +1000,7 @@ export default function Marketplace() {
                           {purchase.prompt.category.icon} {purchase.prompt.category.name}
                         </span>
                         <span className="text-sm text-gray-500">
-                          구매일: {formatDate(purchase.createdAt)}
+                          구매일: {formatDate(purchase.purchasedAt)}
                         </span>
                       </div>
                       
@@ -1023,7 +1017,7 @@ export default function Marketplace() {
                           작성자: {purchase.prompt.author.name}
                         </span>
                         <span className="text-lg font-bold text-green-600">
-                          {purchase.amount === 0 ? "무료" : `₩${purchase.amount.toLocaleString()}`}
+                          {purchase.prompt.price === 0 ? "무료" : `₩${purchase.prompt.price.toLocaleString()}`}
                         </span>
                       </div>
                       
@@ -1078,7 +1072,7 @@ export default function Marketplace() {
             setShowPreview(false);
             setSelectedPrompt(null);
           }}
-          onPurchase={handlePurchase}
+
           isFavorite={favorites.some(fav => fav.promptId === selectedPrompt.id)}
           onToggleFavorite={handleToggleFavorite}
           isLoggedIn={isLoggedIn}

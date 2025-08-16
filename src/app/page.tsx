@@ -12,7 +12,7 @@ export default function HomePage() {
   // 로그인 상태 확인
   useEffect(() => {
     const checkAuth = async () => {
-      const token = localStorage.getItem("prompt_hub_token");
+      const token = localStorage.getItem("token");
       console.log('Checking auth with token:', token ? 'EXISTS' : 'NOT_FOUND');
       
       if (token) {
@@ -31,13 +31,13 @@ export default function HomePage() {
             setIsLoggedIn(true);
           } else {
             console.log('Auth check failed, removing token');
-            localStorage.removeItem("prompt_hub_token");
+            localStorage.removeItem("token");
             setIsLoggedIn(false);
             setUser(null);
           }
         } catch (error) {
           console.error("Auth check error:", error);
-          localStorage.removeItem("prompt_hub_token");
+          localStorage.removeItem("token");
           setIsLoggedIn(false);
           setUser(null);
         }
@@ -51,7 +51,7 @@ export default function HomePage() {
 
   // 로그아웃 함수
   const handleLogout = () => {
-    localStorage.removeItem("prompt_hub_token");
+    localStorage.removeItem("token");
     setIsLoggedIn(false);
     setUser(null);
     window.location.href = "/";

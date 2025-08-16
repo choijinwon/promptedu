@@ -41,7 +41,7 @@ export const apiGet = (endpoint: string, options: RequestInit = {}) => {
   return apiCall(endpoint, { ...options, method: 'GET' });
 };
 
-export const apiPost = (endpoint: string, data: any, options: RequestInit = {}) => {
+export const apiPost = (endpoint: string, data: unknown, options: RequestInit = {}) => {
   return apiCall(endpoint, {
     ...options,
     method: 'POST',

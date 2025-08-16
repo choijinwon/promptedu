@@ -8,25 +8,31 @@ interface Prompt {
   description: string;
   content: string;
   price: number;
-  category: {
-    name: string;
-    icon: string;
-    color: string;
-  };
-  author: {
-    name: string;
-  };
+  type: string;
+  is_public: boolean;
+  status: string;
+  views: number;
   downloads: number;
   rating: number;
-  reviewCount: number;
-  createdAt: string;
+  rating_count: number;
+  created_at: string;
+  categories?: {
+    id: string;
+    name: string;
+    slug: string;
+  };
+  users?: {
+    id: string;
+    username: string;
+    name: string;
+  };
 }
 
 interface Category {
   id: string;
   name: string;
-  icon: string;
-  color: string;
+  description: string;
+  slug: string;
 }
 
 export default function SharedPromptsPage() {
@@ -40,26 +46,58 @@ export default function SharedPromptsPage() {
     // 카테고리 불러오기
     fetch("/api/categories")
       .then(res => res.json())
-      .then(data => setCategories(data.categories || []))
-      .catch(err => console.error("카테고리 로딩 에러:", err));
+      .then(data => {
+        console.log('📋 Categories loaded:', data);
+        setCategories(data.categories || []);
+      })
+      .catch(err => {
+        console.error("❌ 카테고리 로딩 에러:", err);
+      });
 
     // 프롬프트 불러오기
     fetch("/api/shared-prompts")
       .then(res => res.json())
       .then(data => {
+        console.log('📝 Shared prompts loaded:', data);
         setPrompts(data.prompts || []);
         setLoading(false);
       })
       .catch(err => {
-        console.error("프롬프트 로딩 에러:", err);
+        console.error("❌ 프롬프트 로딩 에러:", err);
         setError("프롬프트를 불러오는데 실패했습니다.");
         setLoading(false);
       });
   }, []);
 
-  const filteredPrompts = selectedCategory === "all" 
-    ? prompts 
-    : prompts.filter(prompt => prompt.category.name === selectedCategory);
+  const getCategoryColor = (slug: string) => {
+    const colorMap: { [key: string]: string } = {
+      'productivity': '#10B981', // green
+      'creative': '#3B82F6',     // blue
+      'education': '#8B5CF6',    // purple
+      'business': '#F59E0B',     // amber
+      'development': '#EF4444',  // red
+      'lifestyle': '#06B6D4',    // cyan
+      'entertainment': '#EC4899', // pink
+      'health': '#84CC16'        // lime
+    };
+    return colorMap[slug] || '#6B7280'; // default gray
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'APPROVED':
+        return <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">승인됨</span>;
+      case 'PENDING':
+        return <span className="px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full">대기중</span>;
+      case 'REJECTED':
+        return <span className="px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full">거부됨</span>;
+      default:
+        return <span className="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded-full">{status}</span>;
+    }
+  };
+
+  // 현재는 카테고리 정보가 없으므로 모든 프롬프트 표시
+  const filteredPrompts = prompts;
 
   const formatPrice = (price: number) => {
     return price === 0 ? "무료" : `₩${price.toLocaleString()}`;
@@ -122,14 +160,14 @@ export default function SharedPromptsPage() {
             {categories.map((category) => (
               <button
                 key={category.id}
-                onClick={() => setSelectedCategory(category.name)}
+                onClick={() => setSelectedCategory(category.slug)}
                 className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                  selectedCategory === category.name
+                  selectedCategory === category.slug
                     ? "bg-blue-600 text-white"
                     : "bg-white text-gray-700 hover:bg-gray-50"
                 }`}
               >
-                {category.icon} {category.name}
+                {category.name}
               </button>
             ))}
           </div>
@@ -149,7 +187,7 @@ export default function SharedPromptsPage() {
             <div className="text-gray-500 text-lg">
               {selectedCategory === "all" 
                 ? "등록된 프롬프트가 없습니다." 
-                : `${selectedCategory} 카테고리의 프롬프트가 없습니다.`}
+                : `${categories.find(cat => cat.slug === selectedCategory)?.name} 카테고리의 프롬프트가 없습니다.`}
             </div>
           </div>
         ) : (
@@ -162,16 +200,19 @@ export default function SharedPromptsPage() {
                 {/* 카테고리 배지 */}
                 <div 
                   className="px-4 py-2 text-white text-sm font-medium"
-                  style={{ backgroundColor: prompt.category.color }}
+                  style={{ backgroundColor: getCategoryColor('general') }}
                 >
-                  {prompt.category.icon} {prompt.category.name}
+                  일반
                 </div>
 
                 <div className="p-6">
-                  {/* 제목 */}
-                  <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">
-                    {prompt.title}
-                  </h3>
+                  {/* 제목과 상태 */}
+                  <div className="flex items-start justify-between mb-2">
+                    <h3 className="text-xl font-bold text-gray-900 line-clamp-2 flex-1 mr-2">
+                      {prompt.title}
+                    </h3>
+                    {getStatusBadge(prompt.status)}
+                  </div>
 
                   {/* 설명 */}
                   <p className="text-gray-600 mb-4 line-clamp-3">
@@ -187,8 +228,8 @@ export default function SharedPromptsPage() {
 
                   {/* 메타 정보 */}
                   <div className="flex items-center justify-between text-sm text-gray-600 mb-4">
-                    <span className="font-medium">작성자: {prompt.author.name}</span>
-                    <span className="font-medium">{formatDate(prompt.createdAt)}</span>
+                    <span className="font-medium">작성자: 테스트 사용자</span>
+                    <span className="font-medium">{formatDate(prompt.created_at)}</span>
                   </div>
 
                   {/* 통계 */}
@@ -196,7 +237,7 @@ export default function SharedPromptsPage() {
                     <div className="flex items-center space-x-4">
                       <span className="font-medium">다운로드: {prompt.downloads}</span>
                       <span className="font-medium">평점: {prompt.rating.toFixed(1)} ⭐</span>
-                      <span className="font-medium">리뷰: {prompt.reviewCount}</span>
+                      <span className="font-medium">리뷰: {prompt.rating_count}</span>
                     </div>
                   </div>
 

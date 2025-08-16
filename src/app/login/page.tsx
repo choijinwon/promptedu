@@ -45,7 +45,7 @@ export default function LoginPage() {
       }
       
       // JWT 저장 (localStorage)
-      localStorage.setItem("prompt_hub_token", data.token);
+      localStorage.setItem("token", data.token);
       console.log('Token saved to localStorage');
       
       // 성공시 메인 페이지로 이동
@@ -103,6 +103,32 @@ export default function LoginPage() {
             회원가입하기
           </Link>
         </div>
+
+        {/* 빠른 로그인 버튼 (개발용) */}
+        {process.env.NODE_ENV === 'development' && (
+          <div className="space-y-2">
+            <button
+              type="button"
+              onClick={() => {
+                setEmail('test_local@example.com');
+                setPassword('password123');
+              }}
+              className="w-full bg-green-600 text-white py-2 rounded-lg font-semibold hover:bg-green-700 transition-colors duration-200 text-sm"
+            >
+              🚀 빠른 로그인 (test_local@example.com)
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setEmail('a@test.com');
+                setPassword('password123');
+              }}
+              className="w-full bg-orange-600 text-white py-2 rounded-lg font-semibold hover:bg-orange-700 transition-colors duration-200 text-sm"
+            >
+              🚀 빠른 로그인 (a@test.com)
+            </button>
+          </div>
+        )}
         
         {/* 테스트 계정 정보 */}
         <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">

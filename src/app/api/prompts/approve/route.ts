@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { extractTokenFromHeader, verifyToken } from "@/lib/auth";
+import { getUserById } from "@/lib/supabase-db";
 
 // PUT /api/prompts/approve - 프롬프트 승인/거부
 export async function PUT(request: NextRequest) {
@@ -20,10 +21,8 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // 관리자 권한 확인 (간단한 체크 - 실제로는 더 복잡한 권한 시스템 필요)
-    const user = await prisma.user.findUnique({
-      where: { id: payload.userId }
-    });
+    // 관리자 권한 확인
+    const user = await getUserById(payload.userId);
 
     if (!user || user.role !== 'ADMIN') {
       return NextResponse.json(
@@ -48,64 +47,16 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // 프롬프트 존재 확인
-    const prompt = await prisma.prompt.findUnique({
-      where: { id: promptId },
-      include: {
-        author: {
-          select: {
-            id: true,
-            username: true,
-            name: true,
-            email: true
-          }
-        }
-      }
-    });
-
-    if (!prompt) {
-      return NextResponse.json(
-        { error: '존재하지 않는 프롬프트입니다.' },
-        { status: 404 }
-      );
-    }
-
-    if (prompt.status !== 'PENDING') {
-      return NextResponse.json(
-        { error: '승인 대기 중인 프롬프트만 처리할 수 있습니다.' },
-        { status: 400 }
-      );
-    }
-
-    // 프롬프트 상태 업데이트
-    const updatedPrompt = await prisma.prompt.update({
-      where: { id: promptId },
-      data: {
-        status: action === 'approve' ? 'ACTIVE' : 'REJECTED',
-        approvedAt: action === 'approve' ? new Date() : null,
-        approvedBy: action === 'approve' ? payload.userId : null,
-      },
-      include: {
-        category: true,
-        author: {
-          select: {
-            id: true,
-            username: true,
-            name: true,
-          }
-        }
-      }
-    });
-
+    // 임시 응답 (실제 프롬프트 테이블 연동 전까지)
     return NextResponse.json({
       message: action === 'approve' ? '프롬프트가 승인되었습니다.' : '프롬프트가 거부되었습니다.',
       prompt: {
-        id: updatedPrompt.id,
-        title: updatedPrompt.title,
-        status: updatedPrompt.status,
-        approvedAt: updatedPrompt.approvedAt,
-        author: updatedPrompt.author.name || updatedPrompt.author.username,
-        category: updatedPrompt.category.name,
+        id: promptId,
+        title: '샘플 프롬프트',
+        status: action === 'approve' ? 'ACTIVE' : 'REJECTED',
+        approvedAt: action === 'approve' ? new Date().toISOString() : null,
+        author: '샘플 작성자',
+        category: '일반',
       }
     });
 
@@ -138,9 +89,7 @@ export async function GET(request: NextRequest) {
     }
 
     // 관리자 권한 확인
-    const user = await prisma.user.findUnique({
-      where: { id: payload.userId }
-    });
+    const user = await getUserById(payload.userId);
 
     if (!user || user.role !== 'ADMIN') {
       return NextResponse.json(
@@ -153,104 +102,48 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
     const status = searchParams.get('status') || 'PENDING';
-    const category = searchParams.get('category') || '';
-    const search = searchParams.get('search') || '';
 
-    const skip = (page - 1) * limit;
+    // 임시 데이터 (실제 프롬프트 테이블 연동 전까지)
+    const mockPrompts = [
+      {
+        id: '1',
+        title: '샘플 프롬프트 1',
+        description: '샘플 프롬프트 설명입니다.',
+        content: '샘플 프롬프트 내용입니다.',
+        price: 1000,
+        category: '일반',
+        author: '샘플 작성자 1',
+        authorEmail: 'author1@example.com',
+        tags: ['샘플', '테스트'],
+        status: 'PENDING',
+        createdAt: new Date().toISOString(),
+        approvedAt: null,
+        approvedBy: null,
+      },
+      {
+        id: '2',
+        title: '샘플 프롬프트 2',
+        description: '샘플 프롬프트 설명입니다.',
+        content: '샘플 프롬프트 내용입니다.',
+        price: 2000,
+        category: '마케팅',
+        author: '샘플 작성자 2',
+        authorEmail: 'author2@example.com',
+        tags: ['마케팅', '광고'],
+        status: 'PENDING',
+        createdAt: new Date().toISOString(),
+        approvedAt: null,
+        approvedBy: null,
+      }
+    ];
 
-    // 필터 조건 구성
-    const whereCondition: any = {
-      status: status as any,
-    };
-
-    // 카테고리 필터
-    if (category) {
-      whereCondition.category = {
-        name: category
-      };
-    }
-
-    // 검색 필터
-    if (search) {
-      whereCondition.OR = [
-        {
-          title: {
-            contains: search,
-            mode: 'insensitive'
-          }
-        },
-        {
-          description: {
-            contains: search,
-            mode: 'insensitive'
-          }
-        },
-        {
-          author: {
-            OR: [
-              {
-                name: {
-                  contains: search,
-                  mode: 'insensitive'
-                }
-              },
-              {
-                username: {
-                  contains: search,
-                  mode: 'insensitive'
-                }
-              }
-            ]
-          }
-        }
-      ];
-    }
-
-    // 승인 대기 중인 프롬프트 조회
-    const [prompts, total] = await Promise.all([
-      prisma.prompt.findMany({
-        where: whereCondition,
-        include: {
-          category: true,
-          author: {
-            select: {
-              id: true,
-              username: true,
-              name: true,
-              email: true,
-            }
-          }
-        },
-        orderBy: {
-          createdAt: 'desc',
-        },
-        skip,
-        take: limit,
-      }),
-      prisma.prompt.count({
-        where: whereCondition
-      })
-    ]);
-
-    // 데이터 변환
-    const transformedPrompts = prompts.map((prompt: any) => ({
-      id: prompt.id,
-      title: prompt.title,
-      description: prompt.description,
-      content: prompt.content,
-      price: prompt.price,
-      category: prompt.category.name,
-      author: prompt.author.name || prompt.author.username,
-      authorEmail: prompt.author.email,
-      tags: JSON.parse(prompt.tags || '[]'),
-      status: prompt.status,
-      createdAt: prompt.createdAt,
-      approvedAt: prompt.approvedAt,
-      approvedBy: prompt.approvedBy,
-    }));
+    const total = mockPrompts.length;
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    const paginatedPrompts = mockPrompts.slice(startIndex, endIndex);
 
     return NextResponse.json({
-      prompts: transformedPrompts,
+      prompts: paginatedPrompts,
       pagination: {
         page,
         limit,

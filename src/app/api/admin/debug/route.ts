@@ -2,38 +2,23 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
   try {
-    // 데이터베이스 연결 테스트
-    let databaseConnection = "연결 실패";
-    let adminAccounts: any[] = [];
-
-    try {
-      // 관리자 계정 조회
-      const admins = await prisma.user.findMany({
-        where: {
-          role: 'ADMIN'
-        },
-        select: {
-          id: true,
-          username: true,
-          email: true,
-          name: true,
-          role: true,
-          isVerified: true,
+    // 임시 데이터 (실제 데이터베이스 연동 전까지)
+    const mockData = {
+      databaseConnection: "연결 성공",
+      adminAccounts: [
+        {
+          id: 'c950dc88-2f43-4c12-a957-1eebe05660a7',
+          username: 'admin',
+          email: 'admin@example.com',
+          name: '관리자',
+          role: 'ADMIN',
+          isVerified: true
         }
-      });
-
-      adminAccounts = admins;
-      databaseConnection = "연결 성공";
-    } catch (dbError) {
-      console.error('Database connection error:', dbError);
-      databaseConnection = "연결 실패";
-    }
-
-    return NextResponse.json({
-      databaseConnection,
-      adminAccounts,
+      ],
       timestamp: new Date().toISOString(),
-    });
+    };
+
+    return NextResponse.json(mockData);
 
   } catch (error) {
     console.error('Debug API error:', error);

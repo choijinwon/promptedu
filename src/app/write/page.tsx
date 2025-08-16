@@ -55,24 +55,39 @@ export default function WritePage() {
 
   // 인증 체크
   useEffect(() => {
-    const token = localStorage.getItem("prompt_hub_token");
+    const token = localStorage.getItem("token");
     if (!token) {
-      router.replace("/login");
+      console.log("⚠️ No authentication token found");
+      // 개발 환경에서는 리다이렉트하지 않고 경고만 표시
+      if (process.env.NODE_ENV === 'development') {
+        setError("로그인이 필요합니다. 테스트를 위해 로그인해주세요.");
+        console.log("🔧 Development mode: showing warning instead of redirecting");
+      } else {
+        router.replace("/login");
+      }
+    } else {
+      console.log("✅ Authentication token found");
+      setError(""); // 토큰이 있으면 에러 메시지 제거
     }
   }, [router]);
 
   // 카테고리 불러오기
   useEffect(() => {
+    console.log('📋 Loading categories...');
     fetch("/api/categories")
       .then(res => {
+        console.log('📋 Categories response status:', res.status);
         if (!res.ok) {
           throw new Error("카테고리를 불러오는데 실패했습니다.");
         }
         return res.json();
       })
-      .then(data => setCategories(data.categories || []))
+      .then(data => {
+        console.log('📋 Categories loaded:', data);
+        setCategories(data.categories || []);
+      })
       .catch(err => {
-        console.error("카테고리 로딩 에러:", err);
+        console.error("❌ 카테고리 로딩 에러:", err);
         setError("카테고리를 불러오는데 실패했습니다.");
       });
   }, []);
@@ -125,20 +140,38 @@ export default function WritePage() {
   };
 
   const onSubmit = async (data: FormValues) => {
+    console.log('🚀 Form submission started:', data);
     setLoading(true);
     setError("");
     setSuccess("");
     try {
-      const token = localStorage.getItem("prompt_hub_token");
+      const token = localStorage.getItem("token");
+      console.log('🔑 Token found:', token ? 'Yes' : 'No');
+      
       if (!token) {
-        router.replace("/login");
-        return;
+        if (process.env.NODE_ENV === 'development') {
+          setError("로그인이 필요합니다. 테스트를 위해 로그인해주세요.");
+          setLoading(false);
+          return;
+        } else {
+          router.replace("/login");
+          return;
+        }
       }
 
       // 태그 처리 개선
       const processedTags = data.tags 
         ? data.tags.split(",").map(t => t.trim()).filter(Boolean)
         : [];
+      
+      console.log('🏷️ Processed tags:', processedTags);
+
+      const requestBody = {
+        ...data,
+        tags: processedTags,
+      };
+      
+      console.log('📤 Sending request to /api/prompts:', requestBody);
 
       const res = await fetch("/api/prompts", {
         method: "POST",
@@ -146,21 +179,29 @@ export default function WritePage() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          ...data,
-          tags: processedTags,
-        }),
+        body: JSON.stringify(requestBody),
       });
       
+      console.log('📥 Response status:', res.status);
+      console.log('📥 Response headers:', Object.fromEntries(res.headers.entries()));
+      
       const result = await res.json();
+      console.log('📥 Response data:', result);
+      
       if (!res.ok) {
         throw new Error(result.error || "등록 실패");
       }
       
-      setSuccess("프롬프트가 등록되었습니다! 관리자 승인 후 공개됩니다.");
+      console.log('✅ Prompt registration successful');
+      setSuccess("프롬프트가 등록되었습니다! 관리자 승인 후 공개됩니다. 3초 후 메인 페이지로 이동합니다.");
       reset();
+      
+      // 3초 후 메인 페이지로 이동
+      setTimeout(() => {
+        router.push("/");
+      }, 3000);
     } catch (err: any) {
-      console.error("프롬프트 등록 에러:", err);
+      console.error("❌ 프롬프트 등록 에러:", err);
       setError(err.message || "등록 중 오류 발생");
     } finally {
       setLoading(false);
@@ -189,7 +230,31 @@ export default function WritePage() {
         >
           <h1 className="text-2xl font-bold text-center">프롬프트 등록</h1>
         {error && <div className="text-red-500 text-sm text-center">{error}</div>}
-        {success && <div className="text-green-600 text-sm text-center">{success}</div>}
+        {success && (
+          <div className="text-green-600 text-sm text-center space-y-2">
+            <div>{success}</div>
+            <button
+              type="button"
+              onClick={() => router.push("/")}
+              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm"
+            >
+              🏠 메인 페이지로 바로 이동
+            </button>
+          </div>
+        )}
+        <div>
+          <label className="block mb-1 text-sm font-medium">프롬프트 타입</label>
+          <select
+            {...register("type", { required: true })}
+            className="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="SHARED">무료 공유 프롬프트</option>
+            <option value="MARKETPLACE">유료 마켓플레이스 프롬프트</option>
+          </select>
+          <p className="text-xs text-gray-500 mt-1">
+            무료 공유: 관리자 승인 후 무료로 공유됩니다 | 유료 마켓플레이스: 승인 후 판매됩니다
+          </p>
+        </div>
         <div>
           <label className="block mb-1 text-sm font-medium">카테고리</label>
           <select

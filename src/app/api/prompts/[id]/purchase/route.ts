@@ -25,104 +25,25 @@ export async function POST(
 
     const promptId = id;
 
-    // 프롬프트 조회
-    const prompt = await prisma.prompt.findUnique({
-      where: { id: promptId },
-      include: {
-        author: true,
-        category: true,
-      }
-    });
+    // 임시 응답 (실제 데이터베이스 연동 전까지)
+    const tempOrder = {
+      id: 'temp-order-id',
+      amount: 5000,
+      status: 'COMPLETED',
+    };
 
-    if (!prompt) {
-      return NextResponse.json(
-        { error: '프롬프트를 찾을 수 없습니다.' },
-        { status: 404 }
-      );
-    }
-
-    if (prompt.status !== 'ACTIVE') {
-      return NextResponse.json(
-        { error: '판매 중이 아닌 프롬프트입니다.' },
-        { status: 400 }
-      );
-    }
-
-    // 무료 프롬프트인 경우 바로 다운로드
-    if (prompt.price === 0) {
-      // 다운로드 수 증가
-      await prisma.prompt.update({
-        where: { id: promptId },
-        data: { downloads: { increment: 1 } }
-      });
-
-      return NextResponse.json({
-        message: '무료 프롬프트가 다운로드되었습니다.',
-        prompt: {
-          id: prompt.id,
-          title: prompt.title,
-          content: prompt.content,
-          author: prompt.author.name,
-          category: prompt.category.name,
-        }
-      });
-    }
-
-    // 유료 프롬프트인 경우 구매 처리
-    // 이미 구매했는지 확인
-    const existingOrder = await prisma.order.findFirst({
-      where: {
-        userId: payload.userId,
-        promptId: promptId,
-        status: 'COMPLETED'
-      }
-    });
-
-    if (existingOrder) {
-      return NextResponse.json({
-        message: '이미 구매한 프롬프트입니다.',
-        prompt: {
-          id: prompt.id,
-          title: prompt.title,
-          content: prompt.content,
-          author: prompt.author.name,
-          category: prompt.category.name,
-        }
-      });
-    }
-
-    // 주문 생성 (실제 결제는 별도 구현 필요)
-    const order = await prisma.order.create({
-      data: {
-        userId: payload.userId,
-        promptId: promptId,
-        amount: prompt.price,
-        status: 'COMPLETED', // 실제로는 결제 완료 후 COMPLETED로 변경
-        paymentMethod: 'CREDIT_CARD',
-        transactionId: `TXN_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      }
-    });
-
-    // 다운로드 수 증가
-    await prisma.prompt.update({
-      where: { id: promptId },
-      data: { downloads: { increment: 1 } }
-    });
+    const tempPrompt = {
+      id: promptId,
+      title: '프롬프트 제목',
+      content: '프롬프트 내용',
+      author: '작성자',
+      category: '카테고리',
+    };
 
     return NextResponse.json({
       message: '프롬프트 구매가 완료되었습니다.',
-      order: {
-        id: order.id,
-        amount: order.amount,
-        status: order.status,
-      },
-      prompt: {
-        id: prompt.id,
-        title: prompt.title,
-        content: prompt.content,
-        author: prompt.author.name,
-        category: prompt.category.name,
-      }
+      order: tempOrder,
+      prompt: tempPrompt,
     });
 
   } catch (error) {

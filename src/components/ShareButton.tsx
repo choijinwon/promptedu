@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { ShareIcon, ClipboardDocumentIcon, CheckIcon } from "@heroicons/react/24/outline";
+import { ShareIcon, CheckIcon } from "@heroicons/react/24/outline";
 
 interface ShareButtonProps {
   title: string;

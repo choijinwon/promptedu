@@ -1,7 +1,4 @@
 import { Metadata } from "next";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -10,34 +7,19 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
     const { id } = await params;
-    const prompt = await prisma.prompt.findUnique({
-      where: { id },
-      include: {
-        category: true,
-        author: {
-          select: { name: true, username: true },
-        },
-      },
-    });
-
-    if (!prompt) {
-      return {
-        title: "프롬프트를 찾을 수 없습니다 | Prompt Hub",
-        description: "요청하신 프롬프트를 찾을 수 없습니다.",
-      };
-    }
-
-    const title = `${prompt.title} | Prompt Hub`;
-    const description = prompt.description || `${prompt.title} - 고품질 AI 프롬프트입니다.`;
-    const authorName = prompt.author.name || prompt.author.username || "익명";
+    
+    // 임시 메타데이터 (실제 프롬프트 테이블 연동 전까지)
+    const title = `샘플 프롬프트 | Prompt Hub`;
+    const description = "샘플 프롬프트 - 고품질 AI 프롬프트입니다.";
+    const authorName = "샘플 작성자";
 
     return {
       title,
       description,
       keywords: [
-        prompt.title,
+        "샘플 프롬프트",
         "AI 프롬프트",
-        prompt.category.name,
+        "일반",
         "ChatGPT 프롬프트",
         "Claude 프롬프트",
         "GPT-4 프롬프트",
@@ -50,29 +32,29 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         url: `https://prompt-hub.com/shared-prompts/${id}`,
         images: [
           {
-            url: prompt.image || "/og-prompt.png",
+            url: "/og-prompt.png",
             width: 1200,
             height: 630,
-            alt: prompt.title,
+            alt: title,
           },
         ],
         authors: [authorName],
-        publishedTime: prompt.createdAt.toISOString(),
-        modifiedTime: prompt.updatedAt.toISOString(),
+        publishedTime: new Date().toISOString(),
+        modifiedTime: new Date().toISOString(),
       },
       twitter: {
         card: "summary_large_image",
         title,
         description,
-        images: [prompt.image || "/og-prompt.png"],
+        images: ["/og-prompt.png"],
       },
       alternates: {
         canonical: `/shared-prompts/${id}`,
       },
       other: {
         "article:author": authorName,
-        "article:section": prompt.category.name,
-        "article:tag": prompt.tags ? JSON.parse(prompt.tags).join(", ") : "",
+        "article:section": "일반",
+        "article:tag": "샘플, 테스트",
       },
     };
   } catch (error) {

@@ -43,7 +43,7 @@ export const checkSupabaseConnection = async () => {
       
       // 다른 방법으로 연결 테스트
       try {
-        const { data: testData, error: testError } = await supabase
+        const { error: testError } = await supabase
           .from('users')
           .select('id')
           .limit(1);

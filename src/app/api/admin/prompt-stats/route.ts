@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken, extractTokenFromHeader } from '@/lib/auth';
+import { getUserById } from '@/lib/supabase-db';
 
 export async function GET(request: NextRequest) {
   try {
@@ -20,10 +21,7 @@ export async function GET(request: NextRequest) {
     }
 
     // 관리자 권한 확인
-    const user = await prisma.user.findUnique({
-      where: { id: payload.userId },
-      select: { role: true }
-    });
+    const user = await getUserById(payload.userId);
 
     if (!user || user.role !== 'ADMIN') {
       return NextResponse.json(
@@ -32,26 +30,15 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // 프롬프트 상태별 통계
-    const [pending, approved, rejected, total] = await Promise.all([
-      prisma.prompt.count({
-        where: { status: 'PENDING' }
-      }),
-      prisma.prompt.count({
-        where: { status: 'ACTIVE' }
-      }),
-      prisma.prompt.count({
-        where: { status: 'REJECTED' }
-      }),
-      prisma.prompt.count()
-    ]);
+    // 임시 통계 데이터
+    const mockData = {
+      pending: 0,
+      approved: 0,
+      rejected: 0,
+      total: 0
+    };
 
-    return NextResponse.json({
-      pending,
-      approved,
-      rejected,
-      total
-    });
+    return NextResponse.json(mockData);
 
   } catch (error) {
     console.error('Prompt stats error:', error);

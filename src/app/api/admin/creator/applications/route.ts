@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken, extractTokenFromHeader } from '@/lib/auth';
+import { getUserById } from '@/lib/supabase-db';
 
 export async function GET(request: NextRequest) {
   try {
@@ -20,10 +21,7 @@ export async function GET(request: NextRequest) {
     }
 
     // 관리자 권한 확인
-    const user = await prisma.user.findUnique({
-      where: { id: payload.userId },
-      select: { role: true }
-    });
+    const user = await getUserById(payload.userId);
 
     if (!user || user.role !== 'ADMIN') {
       return NextResponse.json(
@@ -32,46 +30,12 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const { searchParams } = new URL(request.url);
-    const status = searchParams.get('status') || 'PENDING';
+    // 임시 데이터 (실제 데이터베이스 연동 전까지)
+    const mockData = {
+      applications: []
+    };
 
-    // 신청서 목록 조회
-    const applications = await prisma.creatorApplication.findMany({
-      where: {
-        status: status as any,
-      },
-      include: {
-        user: {
-          select: {
-            name: true,
-            username: true,
-            email: true,
-          }
-        }
-      },
-      orderBy: {
-        createdAt: 'desc',
-      }
-    });
-
-    // 데이터 변환
-    const transformedApplications = applications.map((app: any) => ({
-      id: app.id,
-      userId: app.userId,
-      motivation: app.motivation,
-      experience: app.experience,
-      portfolio: app.portfolio,
-      status: app.status,
-      createdAt: app.createdAt,
-      reviewedAt: app.reviewedAt,
-      reviewedBy: app.reviewedBy,
-      feedback: app.reviewNote,
-      user: app.user
-    }));
-
-    return NextResponse.json({
-      applications: transformedApplications
-    });
+    return NextResponse.json(mockData);
 
   } catch (error) {
     console.error('Get creator applications error:', error);

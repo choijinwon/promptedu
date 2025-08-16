@@ -7,6 +7,8 @@ interface AdminStats {
   totalUsers: number;
   totalPrompts: number;
   pendingPrompts: number;
+  approvedPrompts: number;
+  rejectedPrompts: number;
   totalRevenue: number;
 }
 
@@ -213,7 +215,7 @@ export default function AdminDashboardPage() {
                     <div className="flex-1">
                       <h3 className="font-medium text-gray-900">{prompt.title}</h3>
                       <p className="text-sm text-gray-600">
-                        작성자: {prompt.author.name} | 카테고리: {prompt.category.name}
+                        작성자: 테스트 사용자 | 카테고리: 일반
                       </p>
                       <p className="text-sm text-gray-500">
                         가격: ₩{prompt.price.toLocaleString()} | 등록일: {new Date(prompt.createdAt).toLocaleDateString()}

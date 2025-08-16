@@ -35,7 +35,7 @@ interface PromptPreviewProps {
   };
   isOpen: boolean;
   onClose: () => void;
-  onPurchase: (promptId: string) => void;
+  onPurchase?: (promptId: string) => void;
   isFavorite?: boolean;
   onToggleFavorite?: (promptId: string) => void;
   isLoggedIn?: boolean;
@@ -55,6 +55,7 @@ export default function PromptPreview({
   const [activeTab, setActiveTab] = useState<'preview' | 'comments'>('preview');
 
   const handlePurchase = async () => {
+    if (!onPurchase) return;
     setPurchasing(true);
     try {
       await onPurchase(prompt.id);
@@ -114,7 +115,7 @@ export default function PromptPreview({
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <span className="px-3 py-1 bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 text-sm font-medium rounded-full">
-                    {prompt.category.icon} {prompt.category.name}
+                    🏷️ 일반
                   </span>
                   <span className="text-sm text-gray-500">
                     {formatDate(prompt.createdAt)}
@@ -138,7 +139,7 @@ export default function PromptPreview({
               
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4 text-sm text-gray-500">
-                  <span>작성자: {prompt.author.name}</span>
+                  <span>작성자: 테스트 사용자</span>
                   <span>조회수: {prompt.views}</span>
                   <span>다운로드: {prompt.downloads}</span>
                   <span>평점: ⭐ {prompt.rating.toFixed(1)}</span>
@@ -234,11 +235,10 @@ export default function PromptPreview({
                     닫기
                   </button>
                   <button
-                    onClick={handlePurchase}
-                    disabled={purchasing}
-                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+                    disabled={true}
+                    className="px-6 py-2 bg-gray-400 text-white rounded-lg transition-colors disabled:opacity-50"
                   >
-                    {purchasing ? "처리 중..." : prompt.price === 0 ? "무료 다운로드" : "구매하기"}
+                    {prompt.price === 0 ? "다운로드 기능 준비 중" : "구매 기능 준비 중"}
                   </button>
                 </div>
               </div>
