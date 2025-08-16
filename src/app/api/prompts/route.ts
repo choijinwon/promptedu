@@ -14,109 +14,114 @@ export async function GET(request: NextRequest) {
     const sortBy = searchParams.get('sortBy') || 'createdAt';
     const sortOrder = searchParams.get('sortOrder') || 'desc';
 
-    const skip = (page - 1) * limit;
+    console.log('🔍 Fetching prompts with params:', { page, limit, category, search, status, sortBy, sortOrder });
 
-    // Build where clause
-    const where: any = {
-      status: status as any,
-      isPublic: true, // 공개된 프롬프트만 조회
-      type: 'MARKETPLACE', // 마켓플레이스용 프롬프트만 조회
-    };
+    // 임시 샘플 데이터 반환 (데이터베이스 연결 문제 해결 전까지)
+    const samplePrompts = [
+      {
+        id: 'sample-1',
+        title: 'ChatGPT 마케팅 전문가 프롬프트',
+        description: '마케팅 전략과 콘텐츠 제작을 위한 전문적인 ChatGPT 프롬프트입니다.',
+        content: '당신은 10년 경력의 마케팅 전문가입니다. 다음 요청에 대해 전문적인 조언을 제공해주세요...',
+        price: 5000,
+        category: {
+          name: '마케팅',
+          icon: '📈',
+          color: '#10B981',
+        },
+        author: {
+          name: '마케팅 전문가',
+        },
+        rating: 4.8,
+        downloads: 150,
+        views: 1200,
+        tags: ['마케팅', '콘텐츠', '전략'],
+        image: null,
+        reviewCount: 25,
+        favoriteCount: 45,
+        createdAt: new Date('2024-01-15').toISOString(),
+      },
+      {
+        id: 'sample-2',
+        title: 'Claude 창작 도우미 프롬프트',
+        description: '소설, 시, 에세이 등 창작 활동을 돕는 Claude 전용 프롬프트입니다.',
+        content: '당신은 창작 활동을 돕는 문학 전문가입니다. 다음 창작 요청에 대해 도움을 주세요...',
+        price: 3000,
+        category: {
+          name: '창작',
+          icon: '✍️',
+          color: '#8B5CF6',
+        },
+        author: {
+          name: '창작 전문가',
+        },
+        rating: 4.9,
+        downloads: 200,
+        views: 1800,
+        tags: ['창작', '문학', '소설'],
+        image: null,
+        reviewCount: 30,
+        favoriteCount: 60,
+        createdAt: new Date('2024-01-10').toISOString(),
+      },
+      {
+        id: 'sample-3',
+        title: 'GPT-4 비즈니스 분석 프롬프트',
+        description: '비즈니스 데이터 분석과 인사이트 도출을 위한 GPT-4 전용 프롬프트입니다.',
+        content: '당신은 비즈니스 분석 전문가입니다. 제공된 데이터를 분석하여 인사이트를 도출해주세요...',
+        price: 8000,
+        category: {
+          name: '비즈니스',
+          icon: '💼',
+          color: '#3B82F6',
+        },
+        author: {
+          name: '비즈니스 분석가',
+        },
+        rating: 4.7,
+        downloads: 80,
+        views: 950,
+        tags: ['비즈니스', '분석', '데이터'],
+        image: null,
+        reviewCount: 15,
+        favoriteCount: 25,
+        createdAt: new Date('2024-01-05').toISOString(),
+      }
+    ];
+
+    // 검색 필터링 (간단한 구현)
+    let filteredPrompts = samplePrompts;
+    if (search) {
+      filteredPrompts = samplePrompts.filter(prompt => 
+        prompt.title.toLowerCase().includes(search.toLowerCase()) ||
+        prompt.description.toLowerCase().includes(search.toLowerCase()) ||
+        prompt.tags.some(tag => tag.toLowerCase().includes(search.toLowerCase()))
+      );
+    }
 
     if (category && category !== '전체') {
-      where.category = {
-        name: category
-      };
+      filteredPrompts = filteredPrompts.filter(prompt => 
+        prompt.category.name === category
+      );
     }
 
-    if (search) {
-      where.OR = [
-        { title: { contains: search } },
-        { description: { contains: search } },
-        { tags: { contains: search } },
-      ];
-    }
+    // 페이지네이션
+    const total = filteredPrompts.length;
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    const paginatedPrompts = filteredPrompts.slice(startIndex, endIndex);
 
-    // Build order by clause
-    const orderBy: any = {};
-    switch (sortBy) {
-      case 'downloads':
-        orderBy.downloads = sortOrder;
-        break;
-      case 'rating':
-        orderBy.rating = sortOrder;
-        break;
-      case 'price':
-        orderBy.price = sortOrder;
-        break;
-      case 'views':
-        orderBy.views = sortOrder;
-        break;
-      default:
-        orderBy.createdAt = sortOrder;
-    }
-
-    // Get prompts with pagination
-    const [prompts, total] = await Promise.all([
-      prisma.prompt.findMany({
-        where,
-        include: {
-          category: true,
-          author: {
-            select: {
-              id: true,
-              username: true,
-              name: true,
-              avatar: true,
-            }
-          },
-          _count: {
-            select: {
-              reviews: true,
-              favorites: true,
-            }
-          }
-        },
-        orderBy,
-        skip,
-        take: limit,
-      }),
-      prisma.prompt.count({ where })
-    ]);
-
-    // Transform data
-    const transformedPrompts = prompts.map((prompt: any) => ({
-      id: prompt.id,
-      title: prompt.title,
-      description: prompt.description,
-      content: prompt.content,
-      price: prompt.price,
-      category: {
-        name: prompt.category.name,
-        icon: prompt.category.icon || '📝',
-        color: prompt.category.color || '#3B82F6',
-      },
-      author: {
-        name: prompt.author.name || prompt.author.username,
-      },
-      rating: prompt.rating,
-      downloads: prompt.downloads,
-      views: prompt.views,
-      tags: JSON.parse(prompt.tags || '[]'),
-      image: prompt.image,
-      reviewCount: prompt._count.reviews,
-      favoriteCount: prompt._count.favorites,
-      createdAt: prompt.createdAt,
-    }));
+    console.log('✅ Returning sample prompts:', { total, page, limit, returned: paginatedPrompts.length });
 
     return NextResponse.json({
-      prompts: transformedPrompts,
+      prompts: paginatedPrompts,
       pagination: {
         page,
         limit,
         total,
         totalPages: Math.ceil(total / limit),
-      }
+      },
+      isSampleData: true
     });
 
   } catch (error) {
