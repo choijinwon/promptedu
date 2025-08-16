@@ -6,6 +6,7 @@
   NODE_VERSION = "18"
   NODE_ENV = "production"
   PRISMA_GENERATE_DATAPROXY = "true"
+  PRISMA_CLI_QUERY_ENGINE_TYPE = "binary"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"

@@ -83,12 +83,14 @@ export async function POST(request: NextRequest) {
     // 더 구체적인 오류 메시지 제공
     let errorMessage = '서버 오류가 발생했습니다.';
     if (error instanceof Error) {
-      if (error.message.includes('prisma')) {
-        errorMessage = '데이터베이스 연결 오류가 발생했습니다.';
+      if (error.message.includes('prisma') || error.message.includes('database') || error.message.includes('connect')) {
+        errorMessage = '데이터베이스 연결 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
       } else if (error.message.includes('bcrypt')) {
         errorMessage = '비밀번호 처리 중 오류가 발생했습니다.';
       } else if (error.message.includes('jwt')) {
         errorMessage = '토큰 생성 중 오류가 발생했습니다.';
+      } else if (error.message.includes('timeout')) {
+        errorMessage = '요청 시간이 초과되었습니다. 잠시 후 다시 시도해주세요.';
       }
     }
     
