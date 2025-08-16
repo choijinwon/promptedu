@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
             hasDatabaseUrl: !!process.env.DATABASE_URL,
             hasNetlifyDatabaseUrl: !!process.env.NETLIFY_DATABASE_URL,
             hasSupabaseUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
-            hasSupabaseKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+            hasSupabaseKey: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
             connectionError: connectionError ? String(connectionError) : 'Unknown error'
           },
           { status: 503 }

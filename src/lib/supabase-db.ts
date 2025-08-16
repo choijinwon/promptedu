@@ -1,12 +1,12 @@
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY; // Service Role 대신 Anon Key 사용
 
 if (!supabaseUrl || !supabaseKey) {
   console.error('❌ Supabase environment variables are not set');
   console.error('NEXT_PUBLIC_SUPABASE_URL:', !!supabaseUrl);
-  console.error('SUPABASE_SERVICE_ROLE_KEY:', !!supabaseKey);
+  console.error('NEXT_PUBLIC_SUPABASE_ANON_KEY:', !!supabaseKey);
 }
 
 export const supabase = createClient(supabaseUrl!, supabaseKey!, {

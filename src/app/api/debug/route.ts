@@ -9,9 +9,9 @@ export async function GET(request: NextRequest) {
     environment: process.env.NODE_ENV,
     environmentVariables: {
       hasSupabaseUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
-      hasSupabaseKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+      hasSupabaseKey: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
       supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL ? 'SET' : 'NOT_SET',
-      supabaseKey: process.env.SUPABASE_SERVICE_ROLE_KEY ? 'SET' : 'NOT_SET',
+      supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'SET' : 'NOT_SET',
     },
     supabaseTest: null as any,
     errors: [] as string[]
