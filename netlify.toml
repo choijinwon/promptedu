@@ -18,7 +18,7 @@
 [build.environment]
   NODE_VERSION = "18"
   NODE_ENV = "production"
-  PRISMA_GENERATE_DATAPROXY = "true"
+  PRISMA_GENERATE_DATAPROXY = "false"
   PRISMA_CLI_QUERY_ENGINE_TYPE = "binary"
   PRISMA_CLIENT_ENGINE_TYPE = "binary"
   PRISMA_CLIENT_ENGINE_TYPE_BINARY = "true"

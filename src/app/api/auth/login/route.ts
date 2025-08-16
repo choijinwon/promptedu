@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma, checkDatabaseConnection } from '@/lib/prisma';
-import { checkSupabaseConnection, getUserByEmail } from '@/lib/supabase-db';
+import { checkSupabaseConnection, supabase } from '@/lib/supabase-db';
 import { comparePassword, generateToken } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
@@ -15,35 +15,35 @@ export async function POST(request: NextRequest) {
       NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL ? 'SET' : 'NOT_SET',
     });
 
-    // 데이터베이스 연결 상태 확인 (Prisma와 Supabase 모두 시도)
+    // 데이터베이스 연결 상태 확인 (Supabase 우선, Prisma는 백업)
     console.log('🔍 Checking database connections...');
     
     let isConnected = false;
     let connectionMethod = 'none';
     let connectionError = null;
     
-    // 먼저 Prisma 연결 시도
+    // 먼저 Supabase 연결 시도 (Netlify에서 더 안정적)
     try {
-      isConnected = await checkDatabaseConnection();
+      isConnected = await checkSupabaseConnection();
       if (isConnected) {
-        connectionMethod = 'prisma';
-        console.log('✅ Using Prisma connection');
+        connectionMethod = 'supabase';
+        console.log('✅ Using Supabase connection');
       }
     } catch (error) {
-      console.log('❌ Prisma connection failed:', error);
+      console.log('❌ Supabase connection failed:', error);
       connectionError = error;
     }
     
-    // Prisma가 실패하면 Supabase 연결 시도
+    // Supabase가 실패하면 Prisma 연결 시도
     if (!isConnected) {
       try {
-        isConnected = await checkSupabaseConnection();
+        isConnected = await checkDatabaseConnection();
         if (isConnected) {
-          connectionMethod = 'supabase';
-          console.log('✅ Using Supabase connection');
+          connectionMethod = 'prisma';
+          console.log('✅ Using Prisma connection');
         }
       } catch (error) {
-        console.log('❌ Supabase connection also failed:', error);
+        console.log('❌ Prisma connection also failed:', error);
         connectionError = error;
       }
     }
@@ -101,7 +101,20 @@ export async function POST(request: NextRequest) {
         }
       });
     } else if (connectionMethod === 'supabase') {
-      user = await getUserByEmail(email);
+      // Supabase를 사용한 사용자 조회
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('email', email)
+        .single();
+      
+      if (error) {
+        console.error('❌ Supabase user fetch error:', error);
+        user = null;
+      } else {
+        user = data;
+        console.log('✅ User found via Supabase:', { id: user.id, email: user.email });
+      }
     }
 
     if (!user) {
