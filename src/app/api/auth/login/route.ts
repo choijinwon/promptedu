@@ -24,26 +24,38 @@ export async function POST(request: NextRequest) {
     
     // 먼저 Supabase 연결 시도 (Netlify에서 더 안정적)
     try {
+      console.log('🔍 Attempting Supabase connection...');
       isConnected = await checkSupabaseConnection();
       if (isConnected) {
         connectionMethod = 'supabase';
         console.log('✅ Using Supabase connection');
       }
     } catch (error) {
-      console.log('❌ Supabase connection failed:', error);
+      console.error('❌ Supabase connection failed:', error);
+      console.error('❌ Supabase error details:', {
+        name: error instanceof Error ? error.name : 'Unknown',
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : 'No stack trace'
+      });
       connectionError = error;
     }
     
     // Supabase가 실패하면 Prisma 연결 시도
     if (!isConnected) {
       try {
+        console.log('🔍 Attempting Prisma connection...');
         isConnected = await checkDatabaseConnection();
         if (isConnected) {
           connectionMethod = 'prisma';
           console.log('✅ Using Prisma connection');
         }
       } catch (error) {
-        console.log('❌ Prisma connection also failed:', error);
+        console.error('❌ Prisma connection also failed:', error);
+        console.error('❌ Prisma error details:', {
+          name: error instanceof Error ? error.name : 'Unknown',
+          message: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : 'No stack trace'
+        });
         connectionError = error;
       }
     }

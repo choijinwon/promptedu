@@ -20,22 +20,30 @@ export const supabase = createClient(supabaseUrl!, supabaseKey!, {
 export const checkSupabaseConnection = async () => {
   try {
     console.log('🔍 Testing Supabase connection...');
+    console.log('🔍 Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL ? 'SET' : 'NOT_SET');
+    console.log('🔍 Supabase Key:', process.env.SUPABASE_SERVICE_ROLE_KEY ? 'SET' : 'NOT_SET');
     
-    // 간단한 쿼리로 연결 확인
+    // 더 간단한 테스트 - 테이블 존재 여부 확인
     const { data, error } = await supabase
       .from('users')
-      .select('count')
+      .select('id')
       .limit(1);
     
     if (error) {
       console.error('❌ Supabase connection failed:', error);
+      console.error('❌ Error code:', error.code);
+      console.error('❌ Error message:', error.message);
+      console.error('❌ Error details:', error.details);
       return false;
     }
     
     console.log('✅ Supabase connection successful');
+    console.log('✅ Data received:', data);
     return true;
   } catch (error) {
     console.error('❌ Supabase connection error:', error);
+    console.error('❌ Error type:', typeof error);
+    console.error('❌ Error message:', error instanceof Error ? error.message : String(error));
     return false;
   }
 };
