@@ -142,3 +142,24 @@ export const getUserByEmail = async (email: string) => {
     return null;
   }
 };
+
+// 사용자 아이디(username)로 조회
+export const getUserByUsername = async (username: string) => {
+  try {
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('username', username)
+      .single();
+
+    if (error) {
+      console.error('❌ Error fetching user by username:', error);
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('❌ Error fetching user by username:', error);
+    return null;
+  }
+};
