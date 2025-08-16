@@ -1,0 +1,18 @@
+import { NextResponse } from 'next/server';
+
+export async function GET() {
+  return NextResponse.json({ 
+    message: 'pong',
+    timestamp: new Date().toISOString(),
+    api: 'ping'
+  });
+}
+
+export async function POST() {
+  return NextResponse.json({ 
+    message: 'pong',
+    timestamp: new Date().toISOString(),
+    api: 'ping',
+    method: 'POST'
+  });
+}
