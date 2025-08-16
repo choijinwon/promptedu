@@ -1,109 +1,160 @@
-# Supabase 설정 가이드
+# Supabase + Netlify 설정 가이드
 
-## 1. Supabase 프로젝트 생성
+## 1. Supabase 프로젝트 설정
 
-1. [supabase.com](https://supabase.com)에 접속
-2. "Start your project" 클릭
-3. GitHub 계정으로 로그인
-4. 새 프로젝트 생성:
-   - **Name**: prompt-hub
-   - **Database Password**: 안전한 비밀번호 설정
-   - **Region**: 가까운 지역 선택
+### 1.1 Supabase 프로젝트 생성
+1. [Supabase](https://supabase.com)에 가입
+2. 새 프로젝트 생성
+3. 프로젝트 설정에서 다음 정보 확인:
+   - Project URL
+   - Anon Key (public)
+   - Service Role Key (secret)
 
-## 2. 데이터베이스 연결 정보 확인
+### 1.2 데이터베이스 스키마 설정
+Supabase SQL Editor에서 다음 스키마를 실행:
 
-프로젝트 생성 후:
-1. **Settings** → **Database** 메뉴로 이동
-2. **Connection string** 섹션에서 정보 확인
-3. **Connection pooling** 섹션에서 연결 문자열 복사
+```sql
+-- 사용자 테이블
+CREATE TABLE users (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  email TEXT UNIQUE NOT NULL,
+  username TEXT UNIQUE NOT NULL,
+  password TEXT NOT NULL,
+  name TEXT,
+  avatar TEXT,
+  bio TEXT,
+  role TEXT DEFAULT 'USER',
+  is_verified BOOLEAN DEFAULT false,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
 
-## 3. 환경 변수 설정
+-- 카테고리 테이블
+CREATE TABLE categories (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT UNIQUE NOT NULL,
+  description TEXT,
+  icon TEXT,
+  color TEXT,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
 
-`.env` 파일을 다음과 같이 수정:
+-- 프롬프트 테이블
+CREATE TABLE prompts (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  title TEXT NOT NULL,
+  description TEXT NOT NULL,
+  content TEXT NOT NULL,
+  price INTEGER DEFAULT 0,
+  category_id UUID REFERENCES categories(id),
+  author_id UUID REFERENCES users(id),
+  approved_by UUID REFERENCES users(id),
+  approved_at TIMESTAMP WITH TIME ZONE,
+  tags TEXT,
+  image TEXT,
+  downloads INTEGER DEFAULT 0,
+  views INTEGER DEFAULT 0,
+  rating FLOAT DEFAULT 0,
+  review_count INTEGER DEFAULT 0,
+  status TEXT DEFAULT 'DRAFT',
+  is_public BOOLEAN DEFAULT true,
+  is_featured BOOLEAN DEFAULT false,
+  type TEXT DEFAULT 'MARKETPLACE',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
 
-```env
-# Supabase Database URL (PostgreSQL)
-DATABASE_URL="postgresql://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:5432/postgres"
-
-# JWT Secret
-JWT_SECRET="your-super-secret-jwt-key-change-this-in-production"
-
-# Supabase Configuration
-NEXT_PUBLIC_SUPABASE_URL="https://[YOUR-PROJECT-REF].supabase.co"
-NEXT_PUBLIC_SUPABASE_ANON_KEY="[YOUR-ANON-KEY]"
+-- 기타 필요한 테이블들도 추가...
 ```
 
-## 4. 데이터베이스 마이그레이션
+## 2. Netlify 환경변수 설정
 
+### 2.1 Netlify 대시보드에서 설정
+1. Netlify 대시보드 → Site settings → Environment variables
+2. 다음 환경변수 추가:
+
+```
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_DATABASE_URL=postgresql://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:5432/postgres
+```
+
+### 2.2 환경변수 설명
+- `NEXT_PUBLIC_SUPABASE_URL`: Supabase 프로젝트 URL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: 공개 API 키
+- `SUPABASE_DATABASE_URL`: Prisma에서 사용할 데이터베이스 연결 URL
+
+## 3. 로컬 개발 환경 설정
+
+### 3.1 .env.local 파일 생성
+프로젝트 루트에 `.env.local` 파일 생성:
+
+```env
+# Supabase 설정
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_DATABASE_URL=postgresql://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:5432/postgres
+
+# 기타 설정
+DATABASE_URL=postgresql://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:5432/postgres
+JWT_SECRET=your-jwt-secret
+```
+
+### 3.2 Prisma 설정
 ```bash
-# Prisma 클라이언트 재생성
+# Prisma 클라이언트 생성
 npx prisma generate
 
 # 데이터베이스 마이그레이션
-npx prisma db push
-
-# 시드 데이터 실행
-npx prisma db seed
+npx prisma migrate deploy
 ```
 
-## 5. Supabase 대시보드에서 확인
+## 4. 테스트
 
-1. **Table Editor**에서 테이블들이 생성되었는지 확인
-2. **Authentication** → **Users**에서 사용자 확인
-3. **SQL Editor**에서 데이터 확인
+### 4.1 API 테스트
+배포 후 다음 URL로 테스트:
 
-## 6. 배포 시 환경 변수 설정
-
-### Netlify 배포 시:
-1. Netlify 대시보드 → **Site settings** → **Environment variables**
-2. 위의 환경 변수들을 추가
-
-### Vercel 배포 시:
-1. Vercel 대시보드 → **Project settings** → **Environment variables**
-2. 위의 환경 변수들을 추가
-
-## 7. 보안 설정
-
-### Row Level Security (RLS) 설정:
-
-```sql
--- 사용자 테이블에 RLS 활성화
-ALTER TABLE "User" ENABLE ROW LEVEL SECURITY;
-
--- 프롬프트 테이블에 RLS 활성화
-ALTER TABLE "Prompt" ENABLE ROW LEVEL SECURITY;
-
--- 카테고리 테이블에 RLS 활성화
-ALTER TABLE "Category" ENABLE ROW LEVEL SECURITY;
+```
+https://your-site.netlify.app/api/supabase-test
+https://your-site.netlify.app/api/test
 ```
 
-## 8. API 키 관리
-
-- **anon key**: 클라이언트에서 사용
-- **service_role key**: 서버에서 사용 (관리자 기능)
-- **service_role key는 절대 클라이언트에 노출하지 마세요!**
-
-## 9. 연결 테스트
-
-```bash
-# 데이터베이스 연결 테스트
-npx prisma db pull
-
-# API 테스트
-curl http://localhost:3001/api/test-db
+### 4.2 예상 응답
+```json
+{
+  "success": true,
+  "message": "Supabase connection test completed",
+  "environment": "production",
+  "envCheck": {
+    "NEXT_PUBLIC_SUPABASE_URL": true,
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": true,
+    "SUPABASE_DATABASE_URL": true
+  },
+  "isConnected": true,
+  "timestamp": "2024-01-01T00:00:00.000Z"
+}
 ```
 
-## 10. 문제 해결
+## 5. 문제 해결
 
-### 일반적인 문제들:
+### 5.1 연결 오류
+- 환경변수가 올바르게 설정되었는지 확인
+- Supabase 프로젝트가 활성 상태인지 확인
+- 데이터베이스 URL 형식이 올바른지 확인
 
-1. **연결 실패**: DATABASE_URL 확인
-2. **인증 실패**: JWT_SECRET 확인
-3. **RLS 오류**: 테이블 권한 설정 확인
-4. **마이그레이션 실패**: 스키마 충돌 확인
+### 5.2 권한 오류
+- RLS (Row Level Security) 설정 확인
+- 테이블 권한 설정 확인
 
-### 로그 확인:
-```bash
-# Prisma 로그 활성화
-DEBUG="prisma:*" npm run dev
-``` 
+### 5.3 로그 확인
+- Netlify 함수 로그 확인
+- Supabase 대시보드에서 쿼리 로그 확인
+
+## 6. 보안 고려사항
+
+- Service Role Key는 서버 사이드에서만 사용
+- Anon Key는 클라이언트에서 사용 가능
+- RLS 정책을 적절히 설정하여 데이터 보호
+- 환경변수는 절대 Git에 커밋하지 않음 

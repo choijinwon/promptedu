@@ -10,6 +10,8 @@ export async function POST(request: NextRequest) {
       DATABASE_URL: process.env.DATABASE_URL ? 'SET' : 'NOT_SET',
       NETLIFY_DATABASE_URL: process.env.NETLIFY_DATABASE_URL ? 'SET' : 'NOT_SET',
       NETLIFY_DATABASE_URL_UNPOOLED: process.env.NETLIFY_DATABASE_URL_UNPOOLED ? 'SET' : 'NOT_SET',
+      SUPABASE_DATABASE_URL: process.env.SUPABASE_DATABASE_URL ? 'SET' : 'NOT_SET',
+      NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL ? 'SET' : 'NOT_SET',
     });
 
     // 데이터베이스 연결 상태 확인
