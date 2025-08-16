@@ -22,18 +22,16 @@ export const supabase = createClient(supabaseUrl, supabaseKey, {
   }
 });
 
-// 데이터베이스 연결 확인 함수 (더 안전한 방식)
+// 데이터베이스 연결 확인 함수 (테이블 존재 여부와 관계없이)
 export const checkSupabaseConnection = async () => {
   try {
     console.log('🔍 Testing Supabase connection...');
     console.log('🔍 Supabase URL:', supabaseUrl ? 'SET' : 'NOT_SET');
     console.log('🔍 Supabase Key:', supabaseKey ? 'SET' : 'NOT_SET');
     
-    // 가장 간단한 테스트 - 시스템 테이블 조회
+    // 간단한 연결 테스트 - 시스템 정보 조회
     const { data, error } = await supabase
-      .from('users')
-      .select('id')
-      .limit(1);
+      .rpc('version');
     
     if (error) {
       console.error('❌ Supabase connection failed:', error);
@@ -42,17 +40,33 @@ export const checkSupabaseConnection = async () => {
       console.error('❌ Error details:', error.details);
       console.error('❌ Error hint:', error.hint);
       
-      // 테이블이 없는 경우도 연결은 성공으로 간주
-      if (error.code === 'PGRST116') {
-        console.log('⚠️ Table does not exist, but connection is working');
+      // 다른 방법으로 연결 테스트
+      try {
+        const { data: testData, error: testError } = await supabase
+          .from('users')
+          .select('id')
+          .limit(1);
+        
+        if (testError) {
+          console.error('❌ Table access failed:', testError);
+          // 테이블이 없는 경우도 연결은 성공으로 간주
+          if (testError.code === 'PGRST116') {
+            console.log('⚠️ Table does not exist, but connection is working');
+            return true;
+          }
+          return false;
+        }
+        
+        console.log('✅ Supabase connection successful');
         return true;
+      } catch (tableError) {
+        console.error('❌ Table test failed:', tableError);
+        return false;
       }
-      
-      return false;
     }
     
     console.log('✅ Supabase connection successful');
-    console.log('✅ Data received:', data);
+    console.log('✅ Version data:', data);
     return true;
   } catch (error) {
     console.error('❌ Supabase connection error:', error);

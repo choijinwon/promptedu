@@ -21,22 +21,51 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Supabase에서 사용자 정보 조회
-    const user = await getUserById(payload.userId);
-
-    if (!user) {
-      return NextResponse.json(
-        { error: '사용자를 찾을 수 없습니다.' },
-        { status: 404 }
-      );
+    // 임시 사용자 토큰 처리
+    if (payload.userId === 'temp-user-id') {
+      return NextResponse.json({
+        user: {
+          id: 'temp-user-id',
+          email: 'a@test.com',
+          username: 'testuser',
+          name: '테스트 사용자',
+          role: 'USER',
+          isVerified: true,
+        }
+      });
     }
 
-    // 비밀번호 제거
-    const { password: _, ...userWithoutPassword } = user;
+    // 임시 관리자 토큰 처리
+    if (payload.userId === 'temp-admin-id') {
+      return NextResponse.json({
+        user: {
+          id: 'temp-admin-id',
+          email: 'admin@example.com',
+          username: 'admin',
+          name: '관리자',
+          role: 'ADMIN',
+          isVerified: true,
+        }
+      });
+    }
 
-    return NextResponse.json({
-      user: userWithoutPassword
-    });
+    // Supabase에서 사용자 정보 조회 시도
+    try {
+      const user = await getUserById(payload.userId);
+      if (user) {
+        const { password: _, ...userWithoutPassword } = user;
+        return NextResponse.json({
+          user: userWithoutPassword
+        });
+      }
+    } catch (error) {
+      console.error('Supabase user lookup failed:', error);
+    }
+
+    return NextResponse.json(
+      { error: '사용자를 찾을 수 없습니다.' },
+      { status: 404 }
+    );
 
   } catch (error) {
     console.error('Get user error:', error);
