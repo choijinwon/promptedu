@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { hashPassword, generateToken } from '@/lib/auth';
 import { supabase } from '@/lib/supabase-db';
+import { supabase as supabaseAuth } from '@/lib/supabase';
 import { generateVerificationToken, generateVerificationLink, sendVerificationEmail } from '@/lib/email';
 
 export async function POST(request: NextRequest) {
@@ -84,6 +85,104 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // 프로덕션 환경에서는 Supabase Auth 사용
+    if (process.env.NODE_ENV === 'production') {
+      console.log('🚀 Production mode: Using Supabase Auth for registration');
+      
+      try {
+        // Supabase Auth로 사용자 등록
+        const { data: authData, error: authError } = await supabaseAuth.auth.signUp({
+          email: email,
+          password: password,
+          options: {
+            data: {
+              username: username,
+              name: name || username,
+              role: 'USER'
+            },
+            emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/verify-email`
+          }
+        });
+
+        if (authError) {
+          console.error('❌ Supabase Auth registration error:', authError);
+          return NextResponse.json(
+            { error: authError.message || '회원가입 중 오류가 발생했습니다.' },
+            { status: 400 }
+          );
+        }
+
+        if (!authData.user) {
+          return NextResponse.json(
+            { error: '사용자 생성에 실패했습니다.' },
+            { status: 500 }
+          );
+        }
+
+        // Supabase Auth 사용자 정보를 우리 데이터베이스에 동기화
+        const { data: newUser, error: insertError } = await supabase
+          .from('users')
+          .insert({
+            id: authData.user.id,
+            email: email,
+            username: username,
+            password: '', // Supabase Auth에서 비밀번호 관리
+            name: name || username,
+            role: 'USER',
+            is_verified: false, // 이메일 인증 후 true로 변경
+          })
+          .select('id, email, username, name, role, is_verified, created_at')
+          .single();
+
+        if (insertError) {
+          console.error('❌ Error syncing user to database:', insertError);
+          // Supabase Auth 사용자는 생성되었지만 우리 DB 동기화 실패
+          return NextResponse.json(
+            { error: '사용자 정보 동기화 중 오류가 발생했습니다.' },
+            { status: 500 }
+          );
+        }
+
+        console.log('✅ User registered successfully via Supabase Auth:', { 
+          email: newUser.email, 
+          username: newUser.username,
+          authUserId: authData.user.id
+        });
+
+        return NextResponse.json({
+          message: '회원가입이 완료되었습니다. 이메일을 확인하여 인증을 완료해주세요.',
+          user: {
+            id: newUser.id,
+            email: newUser.email,
+            username: newUser.username,
+            name: newUser.name,
+            role: newUser.role,
+            isVerified: newUser.is_verified,
+            createdAt: newUser.created_at,
+          },
+          emailVerification: {
+            required: true,
+            sent: true,
+            message: '인증 이메일이 발송되었습니다. 이메일을 확인해주세요.'
+          },
+          authData: {
+            user: authData.user.id,
+            session: authData.session ? 'created' : 'pending_verification'
+          }
+        });
+
+      } catch (authError) {
+        console.error('❌ Supabase Auth error:', authError);
+        return NextResponse.json(
+          { error: '인증 서비스 오류가 발생했습니다.' },
+          { status: 500 }
+        );
+      }
+    }
+
+    // 개발 환경에서는 기존 방식 사용
+    console.log('🔧 Development mode: Using custom registration');
+    
     // 비밀번호 해시화
     const hashedPassword = await hashPassword(password);
 
