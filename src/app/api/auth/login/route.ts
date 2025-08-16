@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
         });
         
         return NextResponse.json({
-          message: '로그인이 완료되었습니다.',
+          message: '로그인이 완료되었습니다. (데이터베이스 연결 없음)',
           user: {
             id: 'temp-user-id',
             email: 'a@test.com',
@@ -69,16 +69,15 @@ export async function POST(request: NextRequest) {
             isVerified: true,
           },
           token: token,
-          isTemporary: false
+          isTemporary: false,
+          databaseStatus: 'disconnected'
         });
       } else {
         return NextResponse.json(
           { 
             error: '데이터베이스 연결에 실패했습니다. 잠시 후 다시 시도해주세요.',
-            details: 'Prisma와 Supabase 연결 모두 실패했습니다. (테스트 계정: a@test.com / password123)',
+            details: 'Supabase 연결에 문제가 있습니다. (테스트 계정: a@test.com / password123)',
             environment: process.env.NODE_ENV,
-            hasDatabaseUrl: !!process.env.DATABASE_URL,
-            hasNetlifyDatabaseUrl: !!process.env.NETLIFY_DATABASE_URL,
             hasSupabaseUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
             hasSupabaseKey: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
             connectionError: connectionError ? String(connectionError) : 'Unknown error'

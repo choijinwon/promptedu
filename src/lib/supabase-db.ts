@@ -1,29 +1,35 @@
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY; // Service Role 대신 Anon Key 사용
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
+// 환경변수 검증
 if (!supabaseUrl || !supabaseKey) {
   console.error('❌ Supabase environment variables are not set');
   console.error('NEXT_PUBLIC_SUPABASE_URL:', !!supabaseUrl);
   console.error('NEXT_PUBLIC_SUPABASE_ANON_KEY:', !!supabaseKey);
+  throw new Error('Supabase environment variables are required');
 }
 
-export const supabase = createClient(supabaseUrl!, supabaseKey!, {
+// Supabase 클라이언트 생성 (더 안전한 설정)
+export const supabase = createClient(supabaseUrl, supabaseKey, {
   auth: {
     autoRefreshToken: false,
     persistSession: false
+  },
+  db: {
+    schema: 'public'
   }
 });
 
-// 데이터베이스 연결 확인 함수
+// 데이터베이스 연결 확인 함수 (더 안전한 방식)
 export const checkSupabaseConnection = async () => {
   try {
     console.log('🔍 Testing Supabase connection...');
-    console.log('🔍 Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL ? 'SET' : 'NOT_SET');
-    console.log('🔍 Supabase Key:', process.env.SUPABASE_SERVICE_ROLE_KEY ? 'SET' : 'NOT_SET');
+    console.log('🔍 Supabase URL:', supabaseUrl ? 'SET' : 'NOT_SET');
+    console.log('🔍 Supabase Key:', supabaseKey ? 'SET' : 'NOT_SET');
     
-    // 더 간단한 테스트 - 테이블 존재 여부 확인
+    // 가장 간단한 테스트 - 시스템 테이블 조회
     const { data, error } = await supabase
       .from('users')
       .select('id')
@@ -34,6 +40,13 @@ export const checkSupabaseConnection = async () => {
       console.error('❌ Error code:', error.code);
       console.error('❌ Error message:', error.message);
       console.error('❌ Error details:', error.details);
+      
+      // 테이블이 없는 경우도 연결은 성공으로 간주
+      if (error.code === 'PGRST116') {
+        console.log('⚠️ Table does not exist, but connection is working');
+        return true;
+      }
+      
       return false;
     }
     
