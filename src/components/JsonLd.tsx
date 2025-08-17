@@ -60,6 +60,11 @@ export function WebsiteJsonLd() {
             '@type': 'SearchAction',
             target: 'https://promptedu.io/korean-prompt',
             'query-input': 'required name=korean_prompt',
+          },
+          {
+            '@type': 'SearchAction',
+            target: 'https://promptedu.io/ai-tools',
+            'query-input': 'required name=ai_tools',
           }
         ],
       }}

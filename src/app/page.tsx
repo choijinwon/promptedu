@@ -158,6 +158,9 @@ export default function HomePage() {
                 <Link href="/ai-prompt" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">
                   AI 프롬프트
                 </Link>
+                <Link href="/ai-tools" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">
+                  AI 툴
+                </Link>
                 <Link href="/chatgpt-prompt" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">
                   ChatGPT
                 </Link>

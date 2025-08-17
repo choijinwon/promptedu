@@ -32,6 +32,7 @@ Allow: /free-prompt
 Allow: /prompt-purchase
 Allow: /prompt-sale
 Allow: /korean-prompt
+Allow: /ai-tools
 
 # Google specific
 User-agent: Googlebot
