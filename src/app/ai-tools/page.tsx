@@ -322,18 +322,18 @@ export default function AIToolsPage() {
             </div>
 
             <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow">
-              <h3 className="text-xl font-bold mb-3 text-purple-700">v0</h3>
+              <h3 className="text-xl font-bold mb-3 text-purple-700">Kiro</h3>
               <p className="text-gray-600 mb-4 text-sm">
-                목업을 넣으면 거의 완벽한 프로토타입을 생성
+                AI IDE for prototype to production, spec-driven development로 AI 코딩에 구조를 부여
               </p>
               <div className="flex justify-between items-center mb-3">
-                <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">무료/유료</span>
-                <Link href="/marketplace?category=v0" className="text-purple-600 hover:text-purple-800 text-sm font-medium">
+                <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">무료</span>
+                <Link href="/marketplace?category=kiro" className="text-purple-600 hover:text-purple-800 text-sm font-medium">
                   프롬프트 보기 →
                 </Link>
               </div>
               <Link 
-                href="/ai-tools/v0" 
+                href="/ai-tools/kiro" 
                 className="block w-full text-center bg-purple-50 hover:bg-purple-100 text-purple-700 py-2 px-4 rounded-lg transition-colors text-sm font-medium"
               >
                 상세 소개 보기
