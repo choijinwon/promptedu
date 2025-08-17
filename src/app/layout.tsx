@@ -1,15 +1,16 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { WebsiteJsonLd, OrganizationJsonLd } from "@/components/JsonLd";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: {
-    default: "PromptEdu - AI 프롬프트 마켓플레이스 | ChatGPT, Claude 프롬프트 거래",
+    default: "PromptEdu - AI 프롬프트 마켓플레이스 | ChatGPT, Claude, GPT-4 프롬프트 구매 판매",
     template: "%s | PromptEdu"
   },
-  description: "AI 프롬프트 제작자와 사용자를 연결하는 최고의 프롬프트 마켓플레이스입니다. ChatGPT, Claude, GPT-4 등 다양한 AI 모델용 고품질 프롬프트를 구매하고 판매하세요. 무료 프롬프트 공유도 가능합니다.",
+  description: "AI 프롬프트 제작자와 사용자를 연결하는 최고의 프롬프트 마켓플레이스입니다. ChatGPT, Claude, GPT-4 등 다양한 AI 모델용 고품질 프롬프트를 구매하고 판매하세요. 무료 프롬프트 공유도 가능합니다. 프롬프트 엔지니어링, AI 자동화, 챗봇 개발에 필요한 모든 프롬프트를 만나보세요.",
   keywords: [
     "AI 프롬프트",
     "ChatGPT 프롬프트",
@@ -26,7 +27,42 @@ export const metadata: Metadata = {
     "AI 도구",
     "프롬프트 템플릿",
     "AI 비즈니스",
-    "프롬프트 최적화"
+    "프롬프트 최적화",
+    "인공지능 프롬프트",
+    "AI 모델",
+    "머신러닝",
+    "딥러닝",
+    "자연어처리",
+    "AI 개발",
+    "프롬프트 디자인",
+    "AI 솔루션",
+    "스마트 프롬프트",
+    "AI 활용",
+    "프롬프트 라이브러리",
+    "AI 서비스",
+    "프롬프트 공유",
+    "AI 커뮤니티",
+    "프롬프트 구매",
+    "AI 프롬프트 구매 사이트",
+    "고품질 프롬프트 마켓플레이스",
+    "프롬프트 제작자 플랫폼",
+    "프롬프트 판매",
+    "AI 프롬프트 수익",
+    "한국어 프롬프트",
+    "한글 AI 프롬프트",
+    "국내 프롬프트 마켓",
+    "한국어 ChatGPT 프롬프트",
+    "한글 Claude 프롬프트",
+    "한국어 GPT-4 프롬프트",
+    "한국어 자연어처리",
+    "프롬프트 엔지니어링 한국",
+    "AI 대화 프롬프트 템플릿",
+    "무료 프롬프트 다운로드",
+    "프롬프트 어디서 사지",
+    "ChatGPT 프롬프트 예시",
+    "AI 프롬프트 만들기",
+    "프롬프트 엔지니어링 배우기",
+    "AI 활용 프롬프트 모음"
   ],
   authors: [{ name: "PromptEdu Team" }],
   creator: "PromptEdu",
@@ -118,6 +154,8 @@ export default function RootLayout({
         <meta name="naver-site-verification" content="your-verification-code" />
       </head>
       <body className={inter.className}>
+        <WebsiteJsonLd />
+        <OrganizationJsonLd />
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
           {children}
         </div>

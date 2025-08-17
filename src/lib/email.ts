@@ -88,6 +88,96 @@ export const createVerificationEmail = (username: string, verificationLink: stri
   };
 };
 
+// Resend를 사용한 실제 이메일 발송
+async function sendEmailViaResend(email: string, username: string, verificationLink: string) {
+  try {
+    const emailContent = createVerificationEmail(username, verificationLink);
+    
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: 'Prompt Hub <noreply@prompthub.com>',
+        to: email,
+        subject: emailContent.subject,
+        html: emailContent.html,
+        text: emailContent.text,
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      console.error('❌ Resend API error:', error);
+      return { success: false, error };
+    }
+
+    const result = await response.json();
+    console.log('📧 Email sent successfully via Resend!');
+    console.log('Message ID:', result.id);
+    console.log('To:', email);
+    
+    return {
+      success: true,
+      messageId: result.id
+    };
+  } catch (error) {
+    console.error('❌ Error sending email via Resend:', error);
+    return { success: false, error };
+  }
+}
+
+// Mailtrap API를 사용한 실제 이메일 발송
+async function sendEmailViaMailtrapAPI(email: string, username: string, verificationLink: string) {
+  try {
+    const emailContent = createVerificationEmail(username, verificationLink);
+    
+    const response = await fetch('https://sandbox.api.mailtrap.io/api/send/3969271', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.MAILTRAP_API_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: {
+          email: 'noreply@prompthub.com',
+          name: 'Prompt Hub'
+        },
+        to: [
+          {
+            email: email
+          }
+        ],
+        subject: emailContent.subject,
+        html: emailContent.html,
+        text: emailContent.text,
+        category: 'Email Verification'
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error('❌ Mailtrap API error:', response.status, errorData);
+      return { success: false, error: errorData };
+    }
+
+    const result = await response.json();
+    console.log('📧 Email sent successfully via Mailtrap API!');
+    console.log('Message ID:', result.message_id);
+    console.log('To:', email);
+    
+    return {
+      success: true,
+      messageId: result.message_id
+    };
+  } catch (error) {
+    console.error('❌ Error sending email via Mailtrap API:', error);
+    return { success: false, error };
+  }
+}
+
 // Mailtrap을 사용한 실제 이메일 발송
 async function sendEmailViaMailtrap(email: string, username: string, verificationLink: string) {
   try {
@@ -106,7 +196,7 @@ async function sendEmailViaMailtrap(email: string, username: string, verificatio
 
     const info = await transporter.sendMail({
       from: '"Prompt Hub" <noreply@prompthub.com>',
-      to: email,
+      to: email, // 실제 이메일 주소로 발송
       subject: emailContent.subject,
       html: emailContent.html,
       text: emailContent.text,
@@ -115,6 +205,7 @@ async function sendEmailViaMailtrap(email: string, username: string, verificatio
     console.log('📧 Email sent successfully via Mailtrap!');
     console.log('Message ID:', info.messageId);
     console.log('Preview URL:', nodemailer.getTestMessageUrl(info));
+    console.log('To:', email);
     
     return {
       success: true,
@@ -131,6 +222,52 @@ async function sendEmailViaMailtrap(email: string, username: string, verificatio
 export const sendVerificationEmail = async (email: string, username: string, verificationLink: string) => {
   const emailContent = createVerificationEmail(username, verificationLink);
   
+  // Mailtrap API 설정 확인
+  const hasMailtrapAPI = process.env.MAILTRAP_API_TOKEN;
+  
+  console.log('🔍 Mailtrap config check:', {
+    hasAPI: !!hasMailtrapAPI,
+    hasUser: !!process.env.MAILTRAP_USER,
+    hasPass: !!process.env.MAILTRAP_PASS,
+    hasHost: !!process.env.MAILTRAP_HOST,
+    user: process.env.MAILTRAP_USER?.substring(0, 10) + '...',
+    host: process.env.MAILTRAP_HOST
+  });
+  
+  // Mailtrap API가 있으면 우선적으로 사용
+  if (hasMailtrapAPI) {
+    console.log('📧 Mailtrap API configuration found, attempting real email...');
+    const apiResult = await sendEmailViaMailtrapAPI(email, username, verificationLink);
+    
+    if (apiResult.success) {
+      console.log('📧 Real email sent successfully via Mailtrap API!');
+      return true;
+    } else {
+      console.log('📧 Mailtrap API failed, falling back to SMTP');
+      console.error('Mailtrap API error:', apiResult.error);
+    }
+  }
+  
+  // Mailtrap SMTP 설정 확인
+  const hasMailtrapConfig = process.env.MAILTRAP_USER && 
+                           process.env.MAILTRAP_PASS && 
+                           process.env.MAILTRAP_HOST;
+  
+  // Mailtrap SMTP 설정이 있으면 실제 이메일 발송 시도
+  if (hasMailtrapConfig) {
+    console.log('📧 Mailtrap SMTP configuration found, attempting real email...');
+    const mailtrapResult = await sendEmailViaMailtrap(email, username, verificationLink);
+    
+    if (mailtrapResult.success) {
+      console.log('📧 Real email sent successfully via Mailtrap SMTP!');
+      console.log('Preview URL:', mailtrapResult.previewUrl);
+      return true;
+    } else {
+      console.log('📧 Mailtrap SMTP failed, falling back to simulation');
+      console.error('Mailtrap SMTP error:', mailtrapResult.error);
+    }
+  }
+  
   // 로컬 환경에서는 Supabase Auth를 건너뛰고 개발 모드로 처리
   const isLocalhost = process.env.NODE_ENV === 'development' || 
     verificationLink.includes('localhost') || 
@@ -138,20 +275,6 @@ export const sendVerificationEmail = async (email: string, username: string, ver
   
   if (isLocalhost) {
     console.log('🔧 Local environment detected, using development mode');
-    
-    // Mailtrap 설정이 있으면 실제 이메일 발송 시도
-    if (process.env.MAILTRAP_USER && process.env.MAILTRAP_PASS) {
-      console.log('📧 Attempting to send real email via Mailtrap...');
-      const mailtrapResult = await sendEmailViaMailtrap(email, username, verificationLink);
-      
-      if (mailtrapResult.success) {
-        console.log('📧 Real email sent successfully via Mailtrap!');
-        console.log('Preview URL:', mailtrapResult.previewUrl);
-        return true;
-      } else {
-        console.log('📧 Mailtrap failed, falling back to simulation');
-      }
-    }
     
     // 개발 모드 시뮬레이션
     console.log('📧 ==========================================');

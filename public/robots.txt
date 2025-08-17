@@ -7,15 +7,43 @@ Sitemap: https://promptedu.io/sitemap.xml
 # Crawl-delay
 Crawl-delay: 1
 
-# Disallow admin pages
+# Disallow admin and private pages
 Disallow: /admin/
 Disallow: /api/
 Disallow: /dashboard/
 Disallow: /write/
+Disallow: /_next/
+Disallow: /favicon.ico
 
-# Allow important pages
+# Allow important public pages
 Allow: /marketplace
 Allow: /shared-prompts
 Allow: /login
 Allow: /register
-Allow: /creator/apply 
+Allow: /creator/apply
+Allow: /verify-email
+Allow: /ai-prompt
+Allow: /chatgpt-prompt
+Allow: /claude-prompt
+Allow: /gpt4-prompt
+Allow: /prompt-engineering
+Allow: /ai-automation
+Allow: /free-prompt
+Allow: /prompt-purchase
+Allow: /prompt-sale
+Allow: /korean-prompt
+
+# Google specific
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
+
+# Bing specific
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+# Naver specific
+User-agent: Yeti
+Allow: /
+Crawl-delay: 1 

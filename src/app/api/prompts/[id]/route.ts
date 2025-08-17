@@ -14,10 +14,11 @@ const supabase = createClient(
 // PATCH /api/prompts/[id] - 프롬프트 수정
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
-    const promptId = params.id;
+    const promptId = id;
     const body = await request.json();
     
     console.log('🔧 Development mode: bypassing authentication');
@@ -98,10 +99,11 @@ export async function PATCH(
 // GET /api/prompts/[id] - 개별 프롬프트 조회
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
-    const promptId = params.id;
+    const promptId = id;
     
     console.log('📋 Fetching prompt:', promptId);
 
