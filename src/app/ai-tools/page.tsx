@@ -34,7 +34,20 @@ export const metadata: Metadata = {
 export default function AIToolsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      <div className="max-w-6xl mx-auto px-4 py-16">
+      {/* 뒤로 가기 버튼 */}
+      <div className="max-w-6xl mx-auto px-4 pt-8">
+        <Link
+          href="/"
+          className="inline-flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors duration-200 mb-8"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+          <span className="font-medium">홈으로 돌아가기</span>
+        </Link>
+      </div>
+      
+      <div className="max-w-6xl mx-auto px-4 pb-16">
         <h1 className="text-4xl font-bold text-center mb-8 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
           2025년 최신 AI 툴 총정리
         </h1>
