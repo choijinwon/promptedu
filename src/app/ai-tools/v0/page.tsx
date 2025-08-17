@@ -2,22 +2,22 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'v0 - AI 프로토타입 생성 도구 | 목업 기반 완벽한 프로토타입 | PromptEdu',
-  description: 'v0는 목업을 입력하면 거의 완벽한 프로토타입을 생성하는 AI 도구로, 디자인과 개발을 연결하는 혁신적인 플랫폼입니다. v0의 특징, 사용법, 최적화된 프롬프트를 PromptEdu에서 만나보세요.',
+  title: 'Kiro - AI IDE for prototype to production | Spec-driven development | PromptEdu',
+  description: 'Kiro는 프로토타입부터 프로덕션까지를 위한 AI IDE로, spec-driven development를 통해 AI 코딩에 구조를 부여합니다. Kiro의 특징, 사용법, 최적화된 프롬프트를 PromptEdu에서 만나보세요.',
   keywords: [
-    'v0',
-    'AI 프로토타입',
-    '목업 변환',
-    '프로토타입 생성',
-    '디자인 to 코드',
-    'v0 AI',
-    'v0 프롬프트',
+    'Kiro',
+    'AI IDE',
+    'spec-driven development',
+    '프로토타입 to 프로덕션',
+    'AI 코딩',
+    'Kiro AI',
+    'Kiro 프롬프트',
     'AI 도구',
     '생성형 AI'
   ],
   openGraph: {
-    title: 'v0 - AI 프로토타입 생성 도구 | 목업 기반 완벽한 프로토타입',
-    description: 'v0는 목업을 입력하면 거의 완벽한 프로토타입을 생성하는 AI 도구로, 디자인과 개발을 연결하는 혁신적인 플랫폼입니다.',
+    title: 'Kiro - AI IDE for prototype to production | Spec-driven development',
+    description: 'Kiro는 프로토타입부터 프로덕션까지를 위한 AI IDE로, spec-driven development를 통해 AI 코딩에 구조를 부여합니다.',
     url: 'https://promptedu.io/ai-tools/v0',
   },
 };
@@ -32,20 +32,20 @@ export default function V0Page() {
             <span className="text-3xl">🎨</span>
           </div>
           <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-            v0
+            Kiro
           </h1>
           <p className="text-xl text-gray-600 mb-6">
-            AI 프로토타입 생성 도구
+            The AI IDE for prototype to production
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
               무료
             </span>
             <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">
-              프로토타입
+              AI IDE
             </span>
             <span className="bg-pink-100 text-pink-800 px-3 py-1 rounded-full text-sm font-medium">
-              목업 변환
+              Spec-driven
             </span>
           </div>
         </div>
@@ -55,27 +55,27 @@ export default function V0Page() {
           <h2 className="text-2xl font-bold mb-6 text-gray-800">🚀 주요 특징</h2>
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-white rounded-xl p-6 shadow-lg">
-              <h3 className="text-lg font-semibold mb-3 text-purple-600">🎨 목업 기반 생성</h3>
+              <h3 className="text-lg font-semibold mb-3 text-purple-600">📋 Spec-driven Development</h3>
               <p className="text-gray-600">
-                디자인 목업이나 스케치를 입력하면 AI가 분석하여 완전히 작동하는 프로토타입을 생성합니다.
+                프롬프트를 명확한 요구사항, 시스템 설계, 개별 작업으로 변환하여 AI 코딩에 구조를 부여합니다.
               </p>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-lg">
-              <h3 className="text-lg font-semibold mb-3 text-pink-600">⚡ 빠른 프로토타이핑</h3>
+              <h3 className="text-lg font-semibold mb-3 text-pink-600">🤖 Agent Hooks</h3>
               <p className="text-gray-600">
-                몇 분 내에 아이디어를 실제 작동하는 프로토타입으로 변환하여 개발 시간을 크게 단축합니다.
+                "파일 저장"과 같은 이벤트에 트리거되는 AI 에이전트에게 작업을 위임하여 자동화를 구현합니다.
               </p>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-lg">
-              <h3 className="text-lg font-semibold mb-3 text-blue-600">🔧 완전한 기능 구현</h3>
+              <h3 className="text-lg font-semibold mb-3 text-blue-600">🎯 프로토타입 to 프로덕션</h3>
               <p className="text-gray-600">
-                단순한 UI뿐만 아니라 실제 작동하는 기능과 인터랙션을 포함한 완전한 프로토타입을 생성합니다.
+                프로토타입부터 프로덕션까지 전체 개발 라이프사이클을 지원하는 통합 AI IDE 환경을 제공합니다.
               </p>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-lg">
-              <h3 className="text-lg font-semibold mb-3 text-green-600">🎯 다양한 플랫폼 지원</h3>
+              <h3 className="text-lg font-semibold mb-3 text-green-600">🔧 VS Code 호환</h3>
               <p className="text-gray-600">
-                웹, 모바일, 데스크톱 등 다양한 플랫폼에 맞는 프로토타입을 생성하여 유연한 개발을 지원합니다.
+                Open VSX 플러그인, 테마, VS Code 설정을 지원하여 친숙하면서도 AI 최적화된 개발 환경을 제공합니다.
               </p>
             </div>
           </div>
@@ -86,200 +86,193 @@ export default function V0Page() {
           <h2 className="text-2xl font-bold mb-6 text-gray-800">💡 주요 사용 사례</h2>
           <div className="space-y-4">
             <div className="bg-white rounded-xl p-6 shadow-lg">
-              <h3 className="text-lg font-semibold mb-2 text-purple-600">💼 스타트업 및 기업</h3>
+              <h3 className="text-lg font-semibold mb-2 text-purple-600">💼 엔터프라이즈 개발</h3>
               <ul className="text-gray-600 space-y-1">
-                <li>• MVP(최소 기능 제품) 빠른 개발</li>
-                <li>• 투자자 프레젠테이션용 프로토타입</li>
-                <li>• 사용자 피드백 수집용 데모</li>
-                <li>• 내부 검토 및 승인용 모델</li>
+                <li>• 대규모 프로젝트의 구조화된 개발</li>
+                <li>• 팀 협업 및 코드 리뷰 자동화</li>
+                <li>• 엔터프라이즈급 보안 및 프라이버시</li>
+                <li>• 복잡한 시스템 아키텍처 설계</li>
               </ul>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-lg">
-              <h3 className="text-lg font-semibold mb-2 text-pink-600">🎨 디자이너 및 UX 전문가</h3>
+              <h3 className="text-lg font-semibold mb-2 text-pink-600">🚀 빠른 프로토타이핑</h3>
               <ul className="text-gray-600 space-y-1">
-                <li>• 디자인 컨셉 검증</li>
-                <li>• 사용자 경험 테스트</li>
-                <li>• 인터랙션 프로토타입 제작</li>
-                <li>• 클라이언트 시연용 모델</li>
+                <li>• 아이디어에서 작동하는 프로토타입까지</li>
+                <li>• 멀티모달 입력(이미지, 텍스트) 지원</li>
+                <li>• 자동화된 테스트 및 문서화</li>
+                <li>• 실시간 코드 변경 및 검토</li>
               </ul>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-lg">
-              <h3 className="text-lg font-semibold mb-2 text-blue-600">👨‍💻 개발자 및 엔지니어</h3>
+              <h3 className="text-lg font-semibold mb-2 text-blue-600">🤖 AI 에이전트 개발</h3>
               <ul className="text-gray-600 space-y-1">
-                <li>• 기술 검증 및 개념 증명</li>
-                <li>• 새로운 기술 스택 테스트</li>
-                <li>• API 및 서비스 통합 테스트</li>
-                <li>• 성능 및 확장성 검증</li>
+                <li>• 자동화된 작업 실행</li>
+                <li>• 이벤트 기반 트리거 시스템</li>
+                <li>• 백그라운드 작업 처리</li>
+                <li>• 지능형 워크플로우 최적화</li>
               </ul>
             </div>
           </div>
         </section>
 
-        {/* 지원 입력 형식 */}
+        {/* 핵심 기능 */}
         <section className="mb-12">
-          <h2 className="text-2xl font-bold mb-6 text-gray-800">📥 지원 입력 형식</h2>
+          <h2 className="text-2xl font-bold mb-6 text-gray-800">🔧 핵심 기능</h2>
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-white rounded-xl p-6 shadow-lg">
-              <h3 className="text-lg font-semibold mb-3 text-purple-600">🎨 디자인 파일</h3>
+              <h3 className="text-lg font-semibold mb-3 text-purple-600">📋 Spec-driven Development</h3>
               <ul className="text-gray-600 space-y-1 text-sm">
-                <li>• Figma 디자인 파일</li>
-                <li>• Sketch 파일</li>
-                <li>• Adobe XD 파일</li>
-                <li>• Photoshop/Illustrator 파일</li>
-                <li>• PNG/JPG 이미지</li>
+                <li>• 프롬프트를 명확한 요구사항으로 변환</li>
+                <li>• 시스템 설계 및 아키텍처 생성</li>
+                <li>• 개별 작업으로 분해 및 관리</li>
+                <li>• 견고한 테스트로 검증</li>
               </ul>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-lg">
-              <h3 className="text-lg font-semibold mb-3 text-pink-600">✏️ 스케치 및 목업</h3>
+              <h3 className="text-lg font-semibold mb-3 text-pink-600">🤖 Agent Hooks</h3>
               <ul className="text-gray-600 space-y-1 text-sm">
-                <li>• 손으로 그린 스케치</li>
-                <li>• 디지털 목업</li>
-                <li>• 와이어프레임</li>
-                <li>• 플로우차트</li>
-                <li>• 마인드맵</li>
+                <li>• 이벤트 기반 자동화</li>
+                <li>• 백그라운드 작업 실행</li>
+                <li>• 문서화 및 테스트 자동 생성</li>
+                <li>• 코드 성능 최적화</li>
               </ul>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-lg">
-              <h3 className="text-lg font-semibold mb-3 text-blue-600">📝 텍스트 설명</h3>
+              <h3 className="text-lg font-semibold mb-3 text-blue-600">🎨 멀티모달 입력</h3>
               <ul className="text-gray-600 space-y-1 text-sm">
-                <li>• 자연어 설명</li>
-                <li>• 기능 요구사항</li>
-                <li>• 사용자 스토리</li>
-                <li>• 기술 명세서</li>
-                <li>• 비즈니스 로직</li>
+                <li>• UI 디자인 이미지 인식</li>
+                <li>• 아키텍처 화이트보딩 사진</li>
+                <li>• 자연어 텍스트 설명</li>
+                <li>• 컨텍스트 기반 구현 가이드</li>
               </ul>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-lg">
-              <h3 className="text-lg font-semibold mb-3 text-green-600">🔗 기존 코드</h3>
+              <h3 className="text-lg font-semibold mb-3 text-green-600">🔗 MCP 통합</h3>
               <ul className="text-gray-600 space-y-1 text-sm">
-                <li>• HTML/CSS 코드</li>
-                <li>• JavaScript/TypeScript</li>
-                <li>• React/Vue 컴포넌트</li>
-                <li>• API 스펙</li>
-                <li>• 데이터베이스 스키마</li>
+                <li>• 문서, 데이터베이스, API 연결</li>
+                <li>• 외부 도구 및 서비스 통합</li>
+                <li>• 네이티브 MCP 지원</li>
+                <li>• 확장 가능한 생태계</li>
               </ul>
             </div>
           </div>
         </section>
 
-        {/* 생성되는 프로토타입 유형 */}
+        {/* 지원 모델 및 기술 */}
         <section className="mb-12">
-          <h2 className="text-2xl font-bold mb-6 text-gray-800">🎯 생성되는 프로토타입 유형</h2>
+          <h2 className="text-2xl font-bold mb-6 text-gray-800">🤖 지원 모델 및 기술</h2>
           <div className="grid md:grid-cols-3 gap-6">
             <div className="bg-white rounded-xl p-6 shadow-lg">
-              <h3 className="text-lg font-semibold mb-3 text-purple-600">🌐 웹 애플리케이션</h3>
+              <h3 className="text-lg font-semibold mb-3 text-purple-600">🧠 AI 모델</h3>
               <ul className="text-gray-600 space-y-1 text-sm">
-                <li>• 반응형 웹사이트</li>
-                <li>• SPA(Single Page App)</li>
-                <li>• 대시보드 및 관리자 패널</li>
-                <li>• 이커머스 플랫폼</li>
-                <li>• 소셜 네트워킹 앱</li>
+                <li>• Claude Sonnet 3.7</li>
+                <li>• Claude Sonnet 4</li>
+                <li>• 추가 모델 지원 예정</li>
+                <li>• 최신 AI 기술 적용</li>
               </ul>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-lg">
-              <h3 className="text-lg font-semibold mb-3 text-pink-600">📱 모바일 앱</h3>
+              <h3 className="text-lg font-semibold mb-3 text-pink-600">🔧 개발 환경</h3>
               <ul className="text-gray-600 space-y-1 text-sm">
-                <li>• iOS/Android 앱</li>
-                <li>• 하이브리드 앱</li>
-                <li>• PWA(Progressive Web App)</li>
-                <li>• 게임 및 엔터테인먼트</li>
-                <li>• 생산성 도구</li>
+                <li>• VS Code 호환</li>
+                <li>• Open VSX 플러그인</li>
+                <li>• 테마 및 설정 지원</li>
+                <li>• AI 최적화된 환경</li>
               </ul>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-lg">
-              <h3 className="text-lg font-semibold mb-3 text-blue-600">🖥️ 데스크톱 앱</h3>
+              <h3 className="text-lg font-semibold mb-3 text-blue-600">🛡️ 보안 및 프라이버시</h3>
               <ul className="text-gray-600 space-y-1 text-sm">
-                <li>• 크로스 플랫폼 앱</li>
-                <li>• 비즈니스 소프트웨어</li>
-                <li>• 창작 도구</li>
-                <li>• 데이터 분석 도구</li>
-                <li>• 시스템 유틸리티</li>
+                <li>• 엔터프라이즈급 보안</li>
+                <li>• 데이터 프라이버시 보호</li>
+                <li>• 안전한 코드 배포</li>
+                <li>• 규정 준수 지원</li>
               </ul>
             </div>
           </div>
         </section>
 
-        {/* AI 기능 상세 */}
+        {/* 고급 기능 */}
         <section className="mb-12">
-          <h2 className="text-2xl font-bold mb-6 text-gray-800">🤖 AI 기능 상세</h2>
+          <h2 className="text-2xl font-bold mb-6 text-gray-800">🚀 고급 기능</h2>
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-white rounded-xl p-6 shadow-lg">
-              <h3 className="text-lg font-semibold mb-3 text-purple-600">🔍 이미지 분석</h3>
+              <h3 className="text-lg font-semibold mb-3 text-purple-600">🎮 Autopilot 모드</h3>
               <ul className="text-gray-600 space-y-1 text-sm">
-                <li>• UI 요소 자동 인식</li>
-                <li>• 레이아웃 구조 분석</li>
-                <li>• 색상 및 스타일 추출</li>
-                <li>• 컴포넌트 관계 파악</li>
+                <li>• 대규모 작업 자율 실행</li>
+                <li>• 단계별 지시 없이 자동화</li>
+                <li>• 스크립트 및 명령어 실행</li>
+                <li>• 완전한 제어권 유지</li>
               </ul>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-lg">
-              <h3 className="text-lg font-semibold mb-3 text-pink-600">⚙️ 코드 생성</h3>
+              <h3 className="text-lg font-semibold mb-3 text-pink-600">⚙️ Steering 파일</h3>
               <ul className="text-gray-600 space-y-1 text-sm">
-                <li>• HTML/CSS/JavaScript 자동 생성</li>
-                <li>• React/Vue 컴포넌트 생성</li>
-                <li>• API 엔드포인트 구현</li>
-                <li>• 데이터베이스 스키마 생성</li>
+                <li>• 프로젝트별 에이전트 설정</li>
+                <li>• 코딩 표준 및 워크플로우</li>
+                <li>• 컨텍스트 및 도구 설정</li>
+                <li>• 간단한 명령어로 구성</li>
               </ul>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-lg">
-              <h3 className="text-lg font-semibold mb-3 text-blue-600">🎯 기능 구현</h3>
+              <h3 className="text-lg font-semibold mb-3 text-blue-600">📊 코드 변경 추적</h3>
               <ul className="text-gray-600 space-y-1 text-sm">
-                <li>• 사용자 인증 시스템</li>
-                <li>• 데이터 CRUD 작업</li>
-                <li>• 실시간 통신</li>
-                <li>• 파일 업로드/다운로드</li>
+                <li>• 실시간 코드 변경 감지</li>
+                <li>• 단계별 변경 사항 검토</li>
+                <li>• 원클릭 편집 및 승인</li>
+                <li>• 변경 이력 관리</li>
               </ul>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-lg">
-              <h3 className="text-lg font-semibold mb-3 text-green-600">🔧 최적화</h3>
+              <h3 className="text-lg font-semibold mb-3 text-green-600">🔍 스마트 컨텍스트</h3>
               <ul className="text-gray-600 space-y-1 text-sm">
-                <li>• 성능 최적화</li>
-                <li>• 반응형 디자인</li>
-                <li>• 접근성 개선</li>
-                <li>• SEO 최적화</li>
+                <li>• 대규모 코드베이스 이해</li>
+                <li>• 복잡한 기능 구현 지원</li>
+                <li>• 반복 최소화</li>
+                <li>• 의도 기반 프롬프트 이해</li>
               </ul>
             </div>
           </div>
         </section>
 
-        {/* 워크플로우 */}
+        {/* 개발 워크플로우 */}
         <section className="mb-12">
-          <h2 className="text-2xl font-bold mb-6 text-gray-800">⚙️ 워크플로우</h2>
+          <h2 className="text-2xl font-bold mb-6 text-gray-800">⚙️ 개발 워크플로우</h2>
           <div className="space-y-4">
             <div className="bg-white rounded-xl p-6 shadow-lg">
-              <h3 className="text-lg font-semibold mb-2 text-purple-600">1. 입력 및 분석</h3>
+              <h3 className="text-lg font-semibold mb-2 text-purple-600">1. Spec 작성 및 협업</h3>
               <ul className="text-gray-600 space-y-1">
-                <li>• 목업, 스케치, 또는 텍스트 설명 업로드</li>
-                <li>• AI가 입력 내용을 분석하고 구조 파악</li>
-                <li>• 기능 요구사항 및 사용자 플로우 추출</li>
-                <li>• 기술 스택 및 아키텍처 결정</li>
+                <li>• 프롬프트를 명확한 요구사항으로 변환</li>
+                <li>• Kiro와 함께 spec 및 아키텍처 협업</li>
+                <li>• 시스템 설계 및 구조화된 설계 생성</li>
+                <li>• 개별 작업으로 분해 및 검증</li>
               </ul>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-lg">
-              <h3 className="text-lg font-semibold mb-2 text-pink-600">2. 코드 생성</h3>
+              <h3 className="text-lg font-semibold mb-2 text-pink-600">2. 에이전트 구현</h3>
               <ul className="text-gray-600 space-y-1">
-                <li>• 프론트엔드 컴포넌트 자동 생성</li>
-                <li>• 백엔드 API 및 데이터베이스 구현</li>
-                <li>• 사용자 인터페이스 및 스타일링</li>
-                <li>• 기본 기능 및 인터랙션 구현</li>
+                <li>• Kiro 에이전트가 spec을 구현</li>
+                <li>• 사용자 제어권 유지</li>
+                <li>• 자동화된 작업 실행</li>
+                <li>• 백그라운드에서 지속적인 개발</li>
               </ul>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-lg">
-              <h3 className="text-lg font-semibold mb-2 text-blue-600">3. 테스트 및 최적화</h3>
+              <h3 className="text-lg font-semibold mb-2 text-blue-600">3. 코드 검토 및 최적화</h3>
               <ul className="text-gray-600 space-y-1">
-                <li>• 자동화된 테스트 코드 생성</li>
-                <li>• 성능 및 보안 검사</li>
-                <li>• 반응형 디자인 최적화</li>
-                <li>• 사용자 경험 개선</li>
+                <li>• 실시간 코드 변경 추적</li>
+                <li>• 단계별 변경 사항 검토</li>
+                <li>• 성능 및 품질 최적화</li>
+                <li>• 자동화된 테스트 및 문서화</li>
               </ul>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-lg">
-              <h3 className="text-lg font-semibold mb-2 text-green-600">4. 배포 및 공유</h3>
+              <h3 className="text-lg font-semibold mb-2 text-green-600">4. 배포 및 모니터링</h3>
               <ul className="text-gray-600 space-y-1">
-                <li>• 클라우드 플랫폼에 자동 배포</li>
-                <li>• 공유 가능한 링크 생성</li>
-                <li>• 소스 코드 다운로드 제공</li>
-                <li>• 문서 및 가이드 자동 생성</li>
+                <li>• 안전한 코드 배포</li>
+                <li>• 엔터프라이즈급 보안 적용</li>
+                <li>• 성능 모니터링 및 최적화</li>
+                <li>• 지속적인 개선 및 업데이트</li>
               </ul>
             </div>
           </div>
@@ -291,27 +284,27 @@ export default function V0Page() {
           <div className="bg-white rounded-xl p-6 shadow-lg">
             <div className="space-y-4">
               <div>
-                <h3 className="text-lg font-semibold mb-2 text-purple-600">1. 명확한 목적 정의</h3>
+                <h3 className="text-lg font-semibold mb-2 text-purple-600">1. 명확한 요구사항 정의</h3>
                 <p className="text-gray-600">
-                  &ldquo;웹사이트 만들어줘&rdquo;보다는 &ldquo;전자상거래 플랫폼을 만들어줘. 사용자 등록, 상품 검색, 장바구니, 결제 기능이 필요하고, 반응형 디자인으로 모바일에서도 잘 작동해야 해&rdquo;와 같이 구체적으로 설명하세요.
+                  &ldquo;앱 만들어줘&rdquo;보다는 &ldquo;사용자 인증, 파일 업로드, 실시간 채팅 기능을 가진 협업 플랫폼을 만들어줘. React와 Node.js를 사용하고, MongoDB를 데이터베이스로 사용해줘&rdquo;와 같이 구체적으로 설명하세요.
                 </p>
               </div>
               <div>
-                <h3 className="text-lg font-semibold mb-2 text-pink-600">2. 타겟 사용자 명시</h3>
+                <h3 className="text-lg font-semibold mb-2 text-pink-600">2. 시스템 아키텍처 명시</h3>
                 <p className="text-gray-600">
-                  &ldquo;20-30대 젊은 사용자를 대상으로 한 소셜 미디어 앱&rdquo;, &ldquo;기업 관리자를 위한 데이터 분석 대시보드&rdquo;와 같이 타겟 사용자를 명시하세요.
+                  &ldquo;마이크로서비스 아키텍처로 설계하고, RESTful API를 사용해줘&rdquo;, &ldquo;JWT 토큰 기반 인증과 Redis 캐싱을 적용해줘&rdquo;와 같이 아키텍처 요구사항을 명시하세요.
                 </p>
               </div>
               <div>
-                <h3 className="text-lg font-semibold mb-2 text-blue-600">3. 핵심 기능 우선순위</h3>
+                <h3 className="text-lg font-semibold mb-2 text-blue-600">3. 비즈니스 로직 상세화</h3>
                 <p className="text-gray-600">
-                  &ldquo;사용자 인증, 실시간 채팅, 파일 공유가 핵심 기능이고, 나머지는 기본적인 CRUD 기능만 있으면 돼&rdquo;와 같이 기능의 우선순위를 명시하세요.
+                  &ldquo;사용자가 파일을 업로드하면 자동으로 OCR 처리를 하고, 결과를 데이터베이스에 저장한 후 이메일로 알림을 보내줘&rdquo;와 같이 비즈니스 로직을 상세히 설명하세요.
                 </p>
               </div>
               <div>
-                <h3 className="text-lg font-semibold mb-2 text-green-600">4. 기술 요구사항</h3>
+                <h3 className="text-lg font-semibold mb-2 text-green-600">4. 품질 및 보안 요구사항</h3>
                 <p className="text-gray-600">
-                  &ldquo;React와 Node.js를 사용하고, MongoDB를 데이터베이스로 사용해줘&rdquo;, &ldquo;PWA로 만들어서 모바일에서 앱처럼 사용할 수 있게 해줘&rdquo;와 같이 기술 스택을 명시하세요.
+                  &ldquo;단위 테스트와 통합 테스트를 포함하고, SQL 인젝션 방지와 XSS 보호를 적용해줘&rdquo;와 같이 품질 및 보안 요구사항을 명시하세요.
                 </p>
               </div>
             </div>
@@ -321,17 +314,17 @@ export default function V0Page() {
         {/* CTA 섹션 */}
         <section className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl p-8 text-center text-white">
           <h2 className="text-3xl font-bold mb-4">
-            v0 최적화 프롬프트 모음
+            Kiro 최적화 프롬프트 모음
           </h2>
           <p className="text-xl mb-8 opacity-90">
-            v0를 더욱 효과적으로 활용할 수 있는 프롬프트들을 PromptEdu에서 만나보세요
+            Kiro를 더욱 효과적으로 활용할 수 있는 프롬프트들을 PromptEdu에서 만나보세요
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/marketplace?category=v0"
+              href="/marketplace?category=kiro"
               className="px-8 py-4 bg-white text-purple-600 rounded-xl hover:bg-gray-50 transition-all duration-200 font-semibold text-lg"
             >
-              v0 프롬프트 보기
+              Kiro 프롬프트 보기
             </Link>
             <Link
               href="/ai-tools"
