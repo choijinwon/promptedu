@@ -107,6 +107,7 @@ export async function GET(
     
     console.log('📋 Fetching prompt:', promptId);
 
+    // 프롬프트 기본 정보 조회
     const { data: prompt, error } = await supabase
       .from('prompts')
       .select(`
@@ -121,6 +122,10 @@ export async function GET(
         views,
         downloads,
         rating,
+        rating_count,
+        tags,
+        category_id,
+        author_id,
         created_at,
         updated_at
       `)
@@ -135,10 +140,39 @@ export async function GET(
       );
     }
 
-    console.log('✅ Prompt fetched successfully:', prompt);
+    // 카테고리 정보 조회
+    let category = null;
+    if (prompt.category_id) {
+      const { data: categoryData } = await supabase
+        .from('categories')
+        .select('id, name, slug')
+        .eq('id', prompt.category_id)
+        .single();
+      category = categoryData;
+    }
+
+    // 사용자 정보 조회
+    let user = null;
+    if (prompt.author_id) {
+      const { data: userData } = await supabase
+        .from('users')
+        .select('id, username, name')
+        .eq('id', prompt.author_id)
+        .single();
+      user = userData;
+    }
+
+    // 응답 데이터 구성
+    const responseData = {
+      ...prompt,
+      categories: category,
+      users: user
+    };
+
+    console.log('✅ Prompt fetched successfully:', responseData);
 
     return NextResponse.json({
-      prompt
+      prompt: responseData
     });
 
   } catch (error) {

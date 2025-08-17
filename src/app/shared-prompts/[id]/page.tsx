@@ -77,7 +77,26 @@ export default function PromptDetailPage() {
         }
         
         const data = await response.json();
-        setPrompt(data.prompt);
+        
+        // API 응답을 프론트엔드 인터페이스에 맞게 변환
+        const transformedPrompt = {
+          ...data.prompt,
+          category: {
+            name: data.prompt.categories?.name || '기타',
+            icon: '📝',
+            color: 'blue'
+          },
+          author: {
+            name: data.prompt.users?.name || '익명'
+          },
+          reviewCount: data.prompt.rating_count || 0,
+          favoriteCount: 0,
+          tags: data.prompt.tags || [],
+          createdAt: data.prompt.created_at,
+          reviews: []
+        };
+        
+        setPrompt(transformedPrompt);
       } catch (err) {
         setError(err instanceof Error ? err.message : '프롬프트를 불러오는데 실패했습니다');
       } finally {
