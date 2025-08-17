@@ -166,11 +166,11 @@ export default function SlidesgoPage() {
               <div className="space-y-3">
                 <div className="bg-purple-50 p-4 rounded-lg">
                   <p className="text-sm text-purple-800 font-medium">프롬프트 예시:</p>
-                  <p className="text-gray-700 mt-1">"스타트업을 위한 투자 유치 프레젠테이션을 만들어줘. AI 기술 기반의 B2B SaaS 제품이고, 시장 규모는 10억 달러입니다. 10-15장의 슬라이드로 구성하고, 차트와 그래프를 포함해주세요."</p>
+                  <p className="text-gray-700 mt-1">&ldquo;스타트업을 위한 투자 유치 프레젠테이션을 만들어줘. AI 기술 기반의 B2B SaaS 제품이고, 시장 규모는 10억 달러입니다. 10-15장의 슬라이드로 구성하고, 차트와 그래프를 포함해주세요.&rdquo;</p>
                 </div>
                 <div className="bg-pink-50 p-4 rounded-lg">
                   <p className="text-sm text-pink-800 font-medium">프롬프트 예시:</p>
-                  <p className="text-gray-700 mt-1">"분기별 매출 성과 보고서를 만들어줘. Q1-Q4까지의 매출 데이터와 전년 대비 성장률을 포함하고, 전문적이고 깔끔한 디자인으로 제작해주세요."</p>
+                  <p className="text-gray-700 mt-1">&ldquo;분기별 매출 성과 보고서를 만들어줘. Q1-Q4까지의 매출 데이터와 전년 대비 성장률을 포함하고, 전문적이고 깔끔한 디자인으로 제작해주세요.&rdquo;</p>
                 </div>
               </div>
             </div>
@@ -179,11 +179,11 @@ export default function SlidesgoPage() {
               <div className="space-y-3">
                 <div className="bg-purple-50 p-4 rounded-lg">
                   <p className="text-sm text-purple-800 font-medium">프롬프트 예시:</p>
-                  <p className="text-gray-700 mt-1">"대학생을 위한 디지털 마케팅 기초 강의 자료를 만들어줘. 20장의 슬라이드로 구성하고, 실제 사례와 예시를 포함해서 이해하기 쉽게 설명해주세요."</p>
+                  <p className="text-gray-700 mt-1">&ldquo;대학생을 위한 디지털 마케팅 기초 강의 자료를 만들어줘. 20장의 슬라이드로 구성하고, 실제 사례와 예시를 포함해서 이해하기 쉽게 설명해주세요.&rdquo;</p>
                 </div>
                 <div className="bg-pink-50 p-4 rounded-lg">
                   <p className="text-sm text-pink-800 font-medium">프롬프트 예시:</p>
-                  <p className="text-gray-700 mt-1">"기업 임직원 대상 AI 활용 교육 자료를 만들어줘. ChatGPT, Claude 등 주요 AI 도구들의 특징과 업무 활용 방안을 포함하고, 실습 예제도 추가해주세요."</p>
+                  <p className="text-gray-700 mt-1">&ldquo;기업 임직원 대상 AI 활용 교육 자료를 만들어줘. ChatGPT, Claude 등 주요 AI 도구들의 특징과 업무 활용 방안을 포함하고, 실습 예제도 추가해주세요.&rdquo;</p>
                 </div>
               </div>
             </div>
@@ -192,11 +192,11 @@ export default function SlidesgoPage() {
               <div className="space-y-3">
                 <div className="bg-purple-50 p-4 rounded-lg">
                   <p className="text-sm text-purple-800 font-medium">프롬프트 예시:</p>
-                  <p className="text-gray-700 mt-1">"전자상거래 시장 트렌드 분석 프레젠테이션을 만들어줘. 2020-2024년 매출 데이터, 주요 플레이어 분석, 향후 전망을 차트와 그래프로 시각화해주세요."</p>
+                  <p className="text-gray-700 mt-1">&ldquo;전자상거래 시장 트렌드 분석 프레젠테이션을 만들어줘. 2020-2024년 매출 데이터, 주요 플레이어 분석, 향후 전망을 차트와 그래프로 시각화해주세요.&rdquo;</p>
                 </div>
                 <div className="bg-pink-50 p-4 rounded-lg">
                   <p className="text-sm text-pink-800 font-medium">프롬프트 예시:</p>
-                  <p className="text-gray-700 mt-1">"고객 만족도 조사 결과를 프레젠테이션으로 만들어줘. 설문조사 데이터를 바탕으로 파이 차트, 바 차트를 사용해서 결과를 시각화하고, 개선 방안도 제시해주세요."</p>
+                  <p className="text-gray-700 mt-1">&ldquo;고객 만족도 조사 결과를 프레젠테이션으로 만들어줘. 설문조사 데이터를 바탕으로 파이 차트, 바 차트를 사용해서 결과를 시각화하고, 개선 방안도 제시해주세요.&rdquo;</p>
                 </div>
               </div>
             </div>
@@ -262,25 +262,25 @@ export default function SlidesgoPage() {
               <div>
                 <h3 className="text-lg font-semibold mb-2 text-purple-600">1. 구체적인 정보 제공</h3>
                 <p className="text-gray-600">
-                  &ldquo;주제, 대상, 목적, 슬라이드 수, 포함할 내용 등을 구체적으로 명시하세요. 예: '신입사원 교육용 AI 기초 강의 자료, 15장, 실제 사례 포함'&rdquo;
+                  &ldquo;주제, 대상, 목적, 슬라이드 수, 포함할 내용 등을 구체적으로 명시하세요. 예: &apos;신입사원 교육용 AI 기초 강의 자료, 15장, 실제 사례 포함&apos;&rdquo;
                 </p>
               </div>
               <div>
                 <h3 className="text-lg font-semibold mb-2 text-pink-600">2. 시각적 요소 요청</h3>
                 <p className="text-gray-600">
-                  &ldquo;차트, 그래프, 이미지, 아이콘 등 필요한 시각적 요소를 명시하세요. 예: '매출 데이터를 바 차트로 시각화하고, 관련 이미지 포함'&rdquo;
+                  &ldquo;차트, 그래프, 이미지, 아이콘 등 필요한 시각적 요소를 명시하세요. 예: &apos;매출 데이터를 바 차트로 시각화하고, 관련 이미지 포함&apos;&rdquo;
                 </p>
               </div>
               <div>
                 <h3 className="text-lg font-semibold mb-2 text-indigo-600">3. 디자인 스타일 지정</h3>
                 <p className="text-gray-600">
-                  &ldquo;원하는 디자인 스타일이나 색상 테마를 지정하세요. 예: '미니멀하고 전문적인 디자인, 파란색 계열 색상'&rdquo;
+                  &ldquo;원하는 디자인 스타일이나 색상 테마를 지정하세요. 예: &apos;미니멀하고 전문적인 디자인, 파란색 계열 색상&apos;&rdquo;
                 </p>
               </div>
               <div>
                 <h3 className="text-lg font-semibold mb-2 text-blue-600">4. 구조 및 흐름 명시</h3>
                 <p className="text-gray-600">
-                  &ldquo;프레젠테이션의 구조와 흐름을 명시하세요. 예: '도입-문제 제시-해결방안-결론 순서로 구성하고, 각 섹션별로 3-4장씩 배분'&rdquo;
+                  &ldquo;프레젠테이션의 구조와 흐름을 명시하세요. 예: &apos;도입-문제 제시-해결방안-결론 순서로 구성하고, 각 섹션별로 3-4장씩 배분&apos;&rdquo;
                 </p>
               </div>
             </div>

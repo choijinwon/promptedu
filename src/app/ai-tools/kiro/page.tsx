@@ -63,7 +63,7 @@ export default function V0Page() {
             <div className="bg-white rounded-xl p-6 shadow-lg">
               <h3 className="text-lg font-semibold mb-3 text-pink-600">🤖 Agent Hooks</h3>
               <p className="text-gray-600">
-                "파일 저장"과 같은 이벤트에 트리거되는 AI 에이전트에게 작업을 위임하여 자동화를 구현합니다.
+                &ldquo;파일 저장&rdquo;과 같은 이벤트에 트리거되는 AI 에이전트에게 작업을 위임하여 자동화를 구현합니다.
               </p>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-lg">

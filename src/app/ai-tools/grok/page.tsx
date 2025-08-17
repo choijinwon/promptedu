@@ -303,27 +303,27 @@ export default function GrokPage() {
             <div className="space-y-4">
               <div>
                 <h3 className="text-lg font-semibold mb-2 text-red-600">1. 구체적인 질문하기</h3>
-                <p className="text-gray-600">
-                  &ldquo;최신 정보를 원한다면 구체적으로 언제, 어디서, 무엇에 대한 정보인지 명시하세요. 예: '2024년 1월 기준 한국의 AI 정책 동향과 주요 변화사항'&rdquo;
-                </p>
+                                 <p className="text-gray-600">
+                   &ldquo;최신 정보를 원한다면 구체적으로 언제, 어디서, 무엇에 대한 정보인지 명시하세요. 예: &apos;2024년 1월 기준 한국의 AI 정책 동향과 주요 변화사항&apos;&rdquo;
+                 </p>
               </div>
               <div>
                 <h3 className="text-lg font-semibold mb-2 text-orange-600">2. 출처 요청하기</h3>
-                <p className="text-gray-600">
-                  &ldquo;정보의 신뢰성을 확인하려면 출처를 함께 요청하세요. 예: '최신 암호화폐 시장 동향을 알려주고, 신뢰할 수 있는 출처도 함께 제시해줘'&rdquo;
-                </p>
+                                 <p className="text-gray-600">
+                   &ldquo;정보의 신뢰성을 확인하려면 출처를 함께 요청하세요. 예: &apos;최신 암호화폐 시장 동향을 알려주고, 신뢰할 수 있는 출처도 함께 제시해줘&apos;&rdquo;
+                 </p>
               </div>
               <div>
                 <h3 className="text-lg font-semibold mb-2 text-yellow-600">3. 비교 분석 요청</h3>
-                <p className="text-gray-600">
-                  &ldquo;여러 관점을 비교하려면 명시적으로 요청하세요. 예: 'ChatGPT와 Claude의 최신 기능을 비교하고, 각각의 장단점을 분석해줘'&rdquo;
-                </p>
+                                 <p className="text-gray-600">
+                   &ldquo;여러 관점을 비교하려면 명시적으로 요청하세요. 예: &apos;ChatGPT와 Claude의 최신 기능을 비교하고, 각각의 장단점을 분석해줘&apos;&rdquo;
+                 </p>
               </div>
               <div>
                 <h3 className="text-lg font-semibold mb-2 text-purple-600">4. 실시간 정보 확인</h3>
-                <p className="text-gray-600">
-                  &ldquo;최신 정보가 필요한 경우 실시간 검색을 요청하세요. 예: '현재 주식 시장 상황과 최신 뉴스에 영향을 미치는 요소들을 실시간으로 검색해서 알려줘'&rdquo;
-                </p>
+                                 <p className="text-gray-600">
+                   &ldquo;최신 정보가 필요한 경우 실시간 검색을 요청하세요. 예: &apos;현재 주식 시장 상황과 최신 뉴스에 영향을 미치는 요소들을 실시간으로 검색해서 알려줘&apos;&rdquo;
+                 </p>
               </div>
             </div>
           </div>
