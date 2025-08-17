@@ -28,7 +28,20 @@ export const metadata: Metadata = {
 export default function ClaudePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-orange-50">
-      <div className="max-w-4xl mx-auto px-4 py-16">
+      {/* 뒤로 가기 버튼 */}
+      <div className="max-w-4xl mx-auto px-4 pt-8">
+        <Link
+          href="/ai-tools"
+          className="inline-flex items-center space-x-2 text-gray-600 hover:text-purple-600 transition-colors duration-200 mb-8"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+          <span className="font-medium">AI 툴 목록으로</span>
+        </Link>
+      </div>
+      
+      <div className="max-w-4xl mx-auto px-4 pb-16">
         {/* 헤더 */}
         <div className="text-center mb-12">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-purple-500 to-orange-500 rounded-full mb-6">
